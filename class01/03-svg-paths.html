@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <style>
+    body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; }
+    
+    svg {
+      border: solid 1px #808080;
+    }
+    
+  </style>
+</head>
+
+<body>
+  <svg width="960" height="500">
+    <rect x=50 y=50 width=93 height=50 />
+    <rect x=100 y=350 width=40 height=20 />
+    <rect x=200 y=60 width=20 height=20 />
+    <circle cx=500 cy=200 r=30 />
+    
+<!--     M => Move to, L => Line to, Z = Close -->
+    <path transform="scale(4)" d="M0,25 L25,0 L50,25 L75,0 L100,25 L50,75 Z" fill="pink" stroke="pink" /> 
+  </svg>
+</body>

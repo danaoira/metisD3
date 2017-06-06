@@ -17,7 +17,7 @@
 - #d3brokeandmadeart
 - http://www.colors.commutercreative.com/
 
-## Afterword
+## Blog
 
 Today was the first day of class for the Data Visualization with D3.js course at Metis San Francisco. The course was created by Kevin Quealy, who is a graphics editor for the New York Times. The course is taught by Shirley Wu and Seemant K.
 
@@ -25,7 +25,11 @@ Today was the first day of class for the Data Visualization with D3.js course at
 - SVG Transforms
 - SVG Paths
 
+### Basic SVG Shapes
+
 We quickly dove in with a quick overview of XML to show its relation to HTML and SVG. We learned simple SVG shapes and attributes.
+
+### SVG Transforms
 
 Next, we learned about SVG transforms with `translate()` and `scale()`.
 

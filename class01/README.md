@@ -29,13 +29,13 @@ Today was the first day of class for the Data Visualization with D3.js course at
 
 We quickly dove in with a quick overview of XML to show its relation to HTML and SVG. We learned simple SVG shapes and attributes.
 
-[01]
+![01]
 
 ### SVG Transforms
 
 Next, we learned about SVG transforms with `translate()` and `scale()`.
 
-[02]
+![02]
 
 `translate()` we used to move the x and y coordinates of our shapes.
 
@@ -51,19 +51,19 @@ The next topic covered SVG paths, which went over lines, quadratic, curves and a
 
 We first started drawing a shape with paths out by hand, which was a blocky heart. It was a nice example of drawing by hand and understanding the coordinate system.
 
-[03]
+![03]
 
 To practice paths, we created smiley faces using all the things we learned in class.
 
-[04]
+![04]
 
 We were then introduced to a website called SVG Path Builder. It made understanding the differences between lines, quadratics, curves and arcs very easy and also generated the coordinates for the path created.
 
-[05-path-builder]
+![05-path-builder]
 
 We were open to making more smiley faces, so I wanted to challenge myself by making a bunny smiley! This was what I was able to finish by the end of class.
 
-[05-bunny]
+![05-bunny]
 
 I do agree with the instructors that the SVG Path Builder makes it really easy to understand and make paths, but doing them by hand and planning out the coordinates manually is the better way to go about learning it.
 

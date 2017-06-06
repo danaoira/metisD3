@@ -19,6 +19,8 @@
 
 ## Blog
 
+[(View all code examples)](https://bl.ocks.org/danaoira)
+
 Today was the first day of class for the Data Visualization with D3.js course at Metis San Francisco. The course was created by Kevin Quealy, who is a graphics editor for the New York Times. The course is taught by Shirley Wu and Seemant K.
 
 - Basic SVG Shapes

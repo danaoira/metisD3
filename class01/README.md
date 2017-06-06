@@ -72,9 +72,9 @@ Other interesting sites we learned about were:
 - [#d3brokeandmadeart](https://twitter.com/hashtag/d3brokeandmadeart) - A Twitter hashtag of D3 as art
 - [147 Colors](http://www.colors.commutercreative.com/) - An interactive website of 147 CSS common color names
 
-[01]: 01-svg.png "Basic SGV Shapes"
-[02]: 02-svg-transforms.png "SVG Transforms"
-[03]: 03-svg-paths.png "SVG Paths"
-[04]: 04-svg-smiley.png "SVG Smiley"
-[05-path-builder]: 05-svg-path-builder.png "SVG Path Builder"
-[05-bunny]: 05-svg-bunny-in-progress.png "SVG Bunny in Progress"
+[01]: 01-svg.PNG "Basic SGV Shapes"
+[02]: 02-svg-transforms.PNG "SVG Transforms"
+[03]: 03-svg-paths.PNG "SVG Paths"
+[04]: 04-svg-smiley.PNG "SVG Smiley"
+[05-path-builder]: 05-svg-path-builder.PNG "SVG Path Builder"
+[05-bunny]: 05-svg-bunny-in-progress.PNG "SVG Bunny in Progress"

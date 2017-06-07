@@ -35,22 +35,24 @@
 
 <body>
   <svg width="960" height="500">
-    <path class="face" d="M 50 200 C 50 150, 200 0, 100 200 Q 130 195, 150 200 C 150 150, 250 0, 200 200, C 200 350, 0 350, 50 200 Z" />
-    <g class="eyes">
-      <circle cx=80 cy=240 r=10 />
-      <circle cx=145 cy=241 r=10 />
-      <g class="inner" transform="translate(5, -3)">
-        <circle cx=80 cy=240 r=3 />
-        <circle cx=145 cy=241 r=3 />
+    <g transform="scale(1.5)">
+      <path class="face" d="M 50 200 C 50 150, 200 0, 100 200 Q 130 195, 150 200 C 150 150, 250 0, 200 200, C 200 350, 0 350, 50 200 Z" />
+      <g class="eyes">
+        <circle cx=80 cy=240 r=10 />
+        <circle cx=145 cy=241 r=10 />
+        <g class="inner" transform="translate(5, -3)">
+          <circle cx=80 cy=240 r=3 />
+          <circle cx=145 cy=241 r=3 />
+        </g>
+        <g class="inner" transform="translate(-2, 2)">
+          <circle cx=80 cy=240 r=1 />
+          <circle cx=145 cy=241 r=1 />
+        </g>
       </g>
-      <g class="inner" transform="translate(-2, 2)">
-        <circle cx=80 cy=240 r=1 />
-        <circle cx=145 cy=241 r=1 />
+      <g transform="translate(80,265)">
+        <path class="nose" d="M 20 0, L 40 0, L 30 10 Z" />
+        <path class="mouth" d="M 10 10 C 14 15, 20 20, 30 10 C 34 15, 40 20, 50 10" />
       </g>
-    </g>
-    <g transform="translate(80,265)">
-      <path class="nose" d="M 20 0, L 40 0, L 30 10 Z" />
-      <path class="mouth" d="M 10 10 C 14 15, 20 20, 30 10 C 34 15, 40 20, 50 10" />
     </g>
   </svg>
 </body>

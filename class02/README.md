@@ -17,27 +17,27 @@
 - "There are three kinds of lies: Lies, damned lies and statistics. Data Visualization deals with statistics, which makes them the biggest liars. You have a responsibility (if you take it upon yourself) to stick with your principles in data visualization."
 
 - VisualizingData.com
-- r2d3.us/visual-intro-to-machine-learning-part-1
+- http://r2d3.us/visual-intro-to-machine-learning-part-1
 	- Father of scrolly telling!
 - Don't miss class on July 17!
 - Scroll jacking 
 
 ## Selections and Data Binding
-- slides.com/shirleywu/fm-d3intro#/4
+- http://slides.com/shirleywu/fm-d3intro#/4
 - ES6
 	- => {} == function { ... }
 - Thoughts on ES6: Would not recommend a new programmer to take up ES6 unless (a) they master traditional JavaScript and (b) they learned a typed, traditional object-oriented language
 
 - Did a bar chart example using
-	- <rect /> defined
-	- <rect /> not defined => .data() .enter() .append()
+	- `<rect />` defined
+	- `<rect />` not defined => `.data()` `.enter()` `.append()`
 
 ## Scales
 
 - "Your job as a visualizer is to take a ton of unstructured data and make it into something pretty."
 
-- d3.scaleLinear()
-- d3.scaleOrdinal()
+- `d3.scaleLinear()`
+- `d3.scaleOrdinal()`
 - domain = data space
 - range = display space
 
@@ -56,7 +56,7 @@
 ## Homework
 
 - THe Wealth & Health of Nations
-	- jsonformatter.curiousconcept.com
+	- http://jsonformatter.curiousconcept.com
 	- copy/paste data
 	- later: use JSON or .csv()
 	- y-axis: life expectancy

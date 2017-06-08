@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<head>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+
+<body>
+	<svg>
+		<rect />
+		<rect />
+		<rect />
+	</svg>
+</body>
+
+<script>
+	var data = [100, 200, 300];
+	var rectWidth = 30;
+	var height = 300;
+
+	d3.selectAll('rect')
+		.data(data)
+		.attr('x', (d, i) =>  i * rectWidth)
+		.attr('y', d => height - d)
+		.attr('width', rectWidth)
+		.attr('height', d => d)
+		.attr('fill', 'pink')
+		.attr('stroke', '#fff');
+</script>

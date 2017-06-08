@@ -19,7 +19,7 @@
 - VisualizingData.com
 - http://r2d3.us/visual-intro-to-machine-learning-part-1
 	- Father of scrolly telling!
-- Don't miss class on July 17!
+- Don't miss class on July 17! (Scrolly telling!!!)
 - Scroll jacking 
 
 ## Selections and Data Binding

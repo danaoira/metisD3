@@ -27,3 +27,37 @@
 - ES6
 	- => {} == function { ... }
 - Thoughts on ES6: Would not recommend a new programmer to take up ES6 unless (a) they master traditional JavaScript and (b) they learned a typed, traditional object-oriented language
+
+- Did a bar chart example using
+	- <rect /> defined
+	- <rect /> not defined => .data() .enter() .append()
+
+## Scales
+
+- "Your job as a visualizer is to take a ton of unstructured data and make it into something pretty."
+
+- d3.scaleLinear()
+- d3.scaleOrdinal()
+- domain = data space
+- range = display space
+
+- d3.scaleOrdinal()
+	- [a, b, c, d, e, f, g ] => [ red, yellow, pink, ... ]
+	- have to define all values
+
+- yScale = d3.scaleLinear()
+	.domain()
+	.range()
+
+- xScale = d3.scaleLinear()
+	.domain()
+	.range()
+
+## Homework
+
+- THe Wealth & Health of Nations
+	- jsonformatter.curiousconcept.com
+	- copy/paste data
+	- later: use JSON or .csv()
+	- y-axis: life expectancy
+	- x-axis: per capita

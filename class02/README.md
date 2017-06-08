@@ -45,13 +45,13 @@
 	- `[a, b, c, d, e, f, g ]` => `["red", "yellow", "pink", ... ]`
 	- have to define all values
 
-``yScale = d3.scaleLinear()
+```yScale = d3.scaleLinear()
 	.domain()
-	.range()``
+	.range()```
 
-``xScale = d3.scaleLinear()
+```xScale = d3.scaleLinear()
 	.domain()
-	.range()``
+	.range()```
 
 ## Homework
 

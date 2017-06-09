@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<head>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<style>
+		.axes {
+			font-family: "Georgia";
+			font-size: 12px;
+			color: #808080;
+		}
+		.axes_titles { 
+			font-family: "Arial";
+			font-size: 12px;
+			fill: #808080;
+		}
+		.title {
+			font-family: "Georgia";
+			font-size: 36px;
+			color: #808080;
+		}
+	</style>
+</head>
+
+<body>
+	<script>
+		// input: data from nations.json
+		// output: scatterplot with lifeExpectancy (y-axis) over per capita income (x-axis)
+
+		var width = 960;
+		var height = 500;
+		var margin = { top: 20, right: 20, bottom: 20, left: 20 };
+
+		d3.json("nations.json", function(error, json) {
+			if (error) throw error;
+
+			var data = json;
+
+			// min/max
+			var xExtent = d3.extent(data, function(d) { return d.income });
+			var yExtent = d3.extent(data, function(d) { return d.lifeExpectancy });
+
+			// scales
+			var xScale = d3.scaleLinear()
+				.domain(xExtent)								// domain = data space
+				.range([margin.left, width - margin.right]);	// range = display space
+			var yScale = d3.scaleLinear()
+				.domain(yExtent)
+				.range([height - margin.bottom, margin.top]);
+			
+			// axes
+			var xAxis = d3.axisBottom()
+				.scale(xScale);
+			var yAxis = d3.axisLeft()
+				.scale(yScale);
+
+			// make svg
+			var svg = d3.select("body")
+				.append("svg")
+				.attr("width", width)
+				.attr("height", height);
+
+			// make circles
+			svg.selectAll("circle")
+				.data(data)
+				.enter()
+				.append("circle")
+				.attr("cx", function(d) { return xScale(d.income) })
+				.attr("cy", function(d) { return yScale(d.lifeExpectancy) })
+				.attr("r", function(d) { return d.lifeExpectancy / 10 })
+				.attr("fill", "pink")
+				.attr("stroke", "#808080");
+
+			// make axes
+			svg.append("g")
+				.attr("transform", "translate(" + [0, height - margin.bottom] + ")")
+				.call(xAxis)
+				.attr("class", "axes")
+				.append("text")
+				.text("life expectancy (years)")
+				.attr("class", "axes_titles")
+				.attr("transform", "rotate(-90)");
+			svg.append("g")
+				.attr("transform", "translate(" + [margin.left, 0] + ")")
+				.call(yAxis);
+
+			// make date
+			svg.append("text")
+				.text("income per capita, inflation-adjusted (dollars)")
+				.attr("class", "axes_titles")
+				.attr("transform", "translate(" + [width - margin.right, height - margin.bottom] + ")")
+				.attr("text-anchor", "end");
+
+			// effects
+			d3.select("circle")
+				.on("hover", function(d) {
+					svg.append("text")
+						.text(d.name)
+						.attr("x")
+						.attr("y")
+						.style("font-family", "georgia")
+						.style("font-size", "20px")
+						.style("font-style", "italic")
+				})
+			});
+	</script>
+</body>
+</html>

@@ -46,16 +46,19 @@
 	- have to define all values
 
 ```
-yScale = d3.scaleLinear()
+var yScale = d3.scaleLinear()
 	.domain()
 	.range()
 ```
 
 ```
-xScale = d3.scaleLinear()
+var xScale = d3.scaleLinear()
 	.domain()
 	.range()
 ```
+
+```
+var extent = d3.extent(data, function(d) { return d[city] })
 
 ## Homework
 

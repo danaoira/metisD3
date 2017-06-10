@@ -59,6 +59,7 @@ var xScale = d3.scaleLinear()
 
 ```
 var extent = d3.extent(data, function(d) { return d[city] })
+```
 
 ## Homework
 

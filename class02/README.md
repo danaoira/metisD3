@@ -234,8 +234,8 @@ Our take home assignement was to recreate this scatterplot using data from **Nat
 
 For a bonus challenge, we were asked to make it into a bar chart.
 
-[01]: /images/01-wind-map.PNG
-[02]: /images/02-earth-wind-map.PNG
-[03]: /images/03-design-and-redesign.PNG
-[04]: /images/04-visual-intro-to-machine-learning.PNG
-[05]: /images/05-nations.png
+[01]: /01-wind-map.PNG
+[02]: /02-earth-wind-map.PNG
+[03]: /03-design-and-redesign.PNG
+[04]: /04-visual-intro-to-machine-learning.PNG
+[05]: /05-nations.png

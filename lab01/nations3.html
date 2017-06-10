@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<head>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<style>
+    	body { 
+    		margin: 0;
+    		position: fixed;
+    		top: 0;
+    		right: 0;
+    		bottom: 0;
+    		left: 0;
+		}
+
+		.title {
+			font-family: "Georgia";
+			font-size: 32px;
+			/*font-style: oblique;*/
+			fill: #808080;
+		}
+
+		.axis {
+			font-family: "Arial";
+			font-size: 11px;
+		}
+
+		.circle {
+			fill: pink;
+			fill-opacity: 0.5;
+			stroke: #c0c0c0;
+		}
+	</style>
+</head>
+<body>
+	<script>
+		d3.json("nations.json", function(error, json) {
+			if (error) throw error;
+
+			// variables
+			var data = json;
+			var width = 960;
+			var height = 500;
+			var margin = { top: 75, right: 30, bottom: 20, left: 30 };
+
+			// min-max
+			var xExtent = d3.extent(data, function(d) { return d.income });
+			var yExtent = d3.extent(data, function(d) { return d.lifeExpectancy });
+
+			// scales
+			var xScale = d3.scaleLinear()
+				.domain(xExtent)
+				.range([margin.left, width - margin.right]);
+			var yScale = d3.scaleLinear()
+				.domain(yExtent)
+				.range([height - margin.bottom, margin.top]);
+
+			// axes
+			var xAxis = d3.axisBottom()
+				.scale(xScale);
+			var yAxis = d3.axisLeft()
+				.scale(yScale);
+
+			// svg
+			var svg = d3.select("body")
+				.append("svg")
+				.attr("width", width)
+				.attr("height", height);
+
+			// circles
+			var circle = svg.selectAll("circle")
+				.data(data)
+				.enter()
+				.append("circle")
+				.attr("cx", function(d) { return xScale(d.income) })
+				.attr("cy", function(d) { return yScale(d.lifeExpectancy) })
+				.attr("r", 10)
+				.attr("class", "circle");
+
+			// axes
+			var axisX = svg.append("g")
+				.call(xAxis)
+				.attr("transform", "translate(" + [0, height - margin.bottom] + ")")
+				.attr("class", "axes")
+				.append("text")
+				.text("income per capita, inflation-adjusted (dollars)")
+				.attr("transform", "translate(" + [width - margin.right, 0 - margin.bottom / 2] + ")")
+				.attr("text-anchor", "end")
+				.attr("class", "title axis");
+			var axisY = svg.append("g")
+				.call(yAxis)				
+				.attr("transform", "translate(" + [margin.left, 0] + ")")
+				.attr("class", "axes")
+				.append("text")
+				.text("life expectancy (years)")
+				.attr("transform", "translate(" + [margin.left / 2, margin.top] + ") rotate(" + -90 + ")")
+				.attr("class", "title axis");
+
+			// title
+			var title = svg.append("text")
+				.text("The Health and Wealth of Nations, 2009")
+				.attr("class", "title")
+				.attr("transform", "translate(" + [width / 2, margin.top * 0.75] + ")")
+				.attr("text-anchor", "middle");
+		});
+	</script>
+</body>
+</html>

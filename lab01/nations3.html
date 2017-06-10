@@ -14,13 +14,13 @@
 		.title {
 			font-family: "Georgia";
 			font-size: 32px;
-			/*font-style: oblique;*/
-			fill: #808080;
+			fill: #000;
 		}
 
 		.axis {
 			font-family: "Arial";
 			font-size: 11px;
+			fill: #808080;
 		}
 
 		.circle {
@@ -91,15 +91,16 @@
 				.attr("class", "axes")
 				.append("text")
 				.text("life expectancy (years)")
-				.attr("transform", "translate(" + [margin.left / 2, margin.top] + ") rotate(" + -90 + ")")
+				.attr("transform", "translate(" + [margin.left * 0.5, margin.top] + ") rotate(" + -90 + ")")
 				.attr("class", "title axis");
 
 			// title
 			var title = svg.append("text")
 				.text("The Health and Wealth of Nations, 2009")
 				.attr("class", "title")
-				.attr("transform", "translate(" + [width / 2, margin.top * 0.75] + ")")
-				.attr("text-anchor", "middle");
+				.attr("transform", "translate(" + [margin.left + width * 0.5, margin.top * 0.65] + ")")
+				.attr("text-anchor", "middle")
+				.attr("fill", "#000");
 		});
 	</script>
 </body>

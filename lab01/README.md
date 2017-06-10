@@ -38,9 +38,11 @@ It reminded of the JavaScript spaghetti code that programmers liked to make in t
 
 I wanted to take it a step further by practicing some simple data science using Python Pandas.
 
-You can either do it through the **console** or on **Jupyter Notebooks**. Hardcore data scientists like to only use the console, but Jupyter Notebook is really nice for saving and sharing the data for other people to see.
+You can either do it through the **console** or on **Jupyter Notebooks**.
 
-Here's a quick walkthrough of how I use Pandas to quickly understand the data I'm dealing with.
+For quick information that I don't plan on saving, I use the console. If I'm going to save and share the data, I use Jupyter Notebook.
+
+Here's a simple walkthrough of how I use Pandas to quickly understand the data I'm dealing with.
 
 1. Imports
 2. Set variables
@@ -64,9 +66,9 @@ nations.describe()
 nations.head()
 ```
 
-Nothing too in-depth in terms of data science stuff. This amount of Pandas is enough to help me understand what variables I'm working with, what min and max values to expect for my scales and what the data looks like in a more readable form.
+Nothing too in-depth in terms of data science stuff. This amount of information is enough for me to use for D3.js. It helps me understand what variables I'm working with, what min and max values to expect for my scales and what the data looks like in a more readable form.
 
-View the notebook below!
+[![02]](https://github.com/danaoira/metisD3/blob/master/lab01/nations-data-exploration.ipynb)
 
 **Jupyter Notebook:** [View the notebook with output results](https://github.com/danaoira/metisD3/blob/master/lab01/nations-data-exploration.ipynb)
 {: .notice}
@@ -74,6 +76,19 @@ View the notebook below!
 ## D3.js Development
 
 I went through three different versions of the scatterplot.
+
+### Setting Up a Local Server
+
+I also decided to move away from [BlockBuilder](http://blockbuilder.org) and run a local server on my computer. It makes debugging a lot easier.
+
+To do this on Windows:
+
+1. Open a **cmd** prompt.
+2. `cd` to the file directory you want to work in.
+3. Enter `python -m http.server 8000` in the console.
+4. Open up a browser to **http://localhost:8000**.
+
+Voila! Local server all set. Now onto D3 coding. 
 
 ### Version 1
 
@@ -196,13 +211,13 @@ At the very end of each created element, I like to add `.attr("class", "class-na
 
 I will write about CSS practices in another post, since that is an entire topic I can write about for days.
 
-Other than that, here is the final result:
+Other than that, here is the final result using two different scales:
 
-## scaleLinear
+### `scaleLinear()`
 
 [![05]](http://blockbuilder.org/danaoira/cb7faa4758a0e9525c7b07c3154df22c)
 
-## scaleLog
+### `scaleLog()`
 
 [![06]](http://blockbuilder.org/danaoira/cb7faa4758a0e9525c7b07c3154df22c)
 

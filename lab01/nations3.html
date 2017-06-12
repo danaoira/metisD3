@@ -46,9 +46,13 @@
 			var yExtent = d3.extent(data, function(d) { return d.lifeExpectancy });
 
 			// scales
-			var xScale = d3.scaleLog()
+			var xScaleLinear = d3.scaleLinear()
 				.domain(xExtent)
 				.range([margin.left, width - margin.right]);
+			var xScaleLog = d3.scaleLog()
+				.domain(xExtent)
+				.range([margin.left, width - margin.right]);
+			var xScale = xScaleLinear;
 			var yScale = d3.scaleLinear()
 				.domain(yExtent)
 				.range([height - margin.bottom, margin.top]);
@@ -78,21 +82,12 @@
 			// axes
 			var axisX = svg.append("g")
 				.call(xAxis)
-				.attr("transform", "translate(" + [0, height - margin.bottom] + ")")
-				.attr("class", "axes")
-				.append("text")
-				.text("income per capita, inflation-adjusted (dollars)")
-				.attr("transform", "translate(" + [width - margin.right, 0 - margin.bottom / 2] + ")")
-				.attr("text-anchor", "end")
-				.attr("class", "title axis");
+				.attr("transform", "translate(" + [0, height - margin.bottom] + ")");
+
 			var axisY = svg.append("g")
 				.call(yAxis)				
-				.attr("transform", "translate(" + [margin.left, 0] + ")")
-				.attr("class", "axes")
-				.append("text")
-				.text("life expectancy (years)")
-				.attr("transform", "translate(" + [margin.left * 0.5, margin.top] + ") rotate(" + -90 + ")")
-				.attr("class", "title axis");
+				.attr("transform", "translate(" + [margin.left, 0] + ")");
+
 
 			// title
 			var title = svg.append("text")
@@ -101,6 +96,43 @@
 				.attr("transform", "translate(" + [margin.left + width * 0.5, margin.top * 0.65] + ")")
 				.attr("text-anchor", "middle")
 				.attr("fill", "#000");
+
+			var xTitle = axisX.append("text")
+				.text("income per capita (dollars)")
+				.attr("transform", "translate(" + [width - margin.right, 0 - margin.bottom / 2] + ")")
+				.attr("text-anchor", "end")
+				.attr("class", "axis");
+
+			var yTitle = axisY.append("text")
+				.text("life expectancy (years)")
+				.attr("transform", "translate(" + [margin.left * 0.5, margin.top] + ") rotate(" + -90 + ")")
+				.attr("class", "axis");	
+
+			d3.select("svg")
+				.on("click", function() {
+					if (xScale == xScaleLinear) {
+						xScale = xScaleLog;
+						xAxis.scale(xScale).ticks(10, ".0f")
+						xTitle.text("income per capita, inflation adjusted (dollars)");
+					} else if (xScale == xScaleLog) {
+						xScale = xScaleLinear;
+						xAxis.scale(xScale)
+						xTitle.text("income per capita (dollars)");
+					}
+
+					svg.selectAll("circle")
+						.data(data)
+						.transition()
+						.duration(1000)
+						.attr("cx", function(d) { return xScale(d.income) })
+						.attr("cy", function(d) { return yScale(d.lifeExpectancy) })
+						.attr("r", 10)
+						.attr("class", "circle");
+
+					axisX.transition()
+						.duration(1000)
+						.call(xAxis);
+				});
 		});
 	</script>
 </body>

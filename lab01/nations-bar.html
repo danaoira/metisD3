@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<head>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<style>
+    	body { 
+    		margin: 0;
+    		position: fixed;
+    		top: 0;
+    		right: 0;
+    		bottom: 0;
+    		left: 0;
+		}
+
+		.title {
+			font-family: "Georgia";
+			font-size: 32px;
+			fill: #000;
+		}
+
+		.axis {
+			font-family: "Arial";
+			font-size: 11px;
+			fill: #808080;
+		}
+
+		.bar, .circle {
+			fill: pink;
+			fill-opacity: 0.5;
+			stroke: #c0c0c0;
+		}
+	</style>
+</head>
+<body>
+	<script>
+		d3.json("nations.json", function(error, json) {
+			if (error) throw error;
+
+			// variables
+			var data = json;
+			var width = 960;
+			var height = 500;
+			var margin = { top: 75, right: 30, bottom: 20, left: 30 };
+
+			// min-max
+			var xExtent = d3.extent(data, function(d) { return d.income });
+			var yExtent = d3.extent(data, function(d) { return d.lifeExpectancy });
+
+			// scales
+			var xScale = d3.scaleLinear()
+				.domain(xExtent)
+				.range([margin.left, width - margin.right]);
+			var yScale = d3.scaleLinear()
+				.domain(yExtent)
+				.range([margin.top, height - margin.bottom]);
+
+			// axes
+			var xAxis = d3.axisBottom()
+				.scale(xScale);
+			var yAxis = d3.axisLeft()
+				.scale(yScale);
+
+			// svg
+			var svg = d3.select("body")
+				.append("svg")
+				.attr("width", width)
+				.attr("height", height);
+
+			// bar
+			var bar = svg.selectAll("rect")
+				.data(data)
+				.enter()
+				.append("rect")
+				.attr("x", function(d, i) { return xScale(i * 3) })
+				.attr("y", function(d) { return height - d.lifeExpectancy })
+				.attr("width", 3)
+				.attr("height", function(d) { return d.lifeExpectancy })
+				.attr("class", "bar");
+
+			// axes
+
+			// titles
+		});
+	</script>
+</body>
+</html>

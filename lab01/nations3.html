@@ -49,10 +49,13 @@
 			var xScaleLinear = d3.scaleLinear()
 				.domain(xExtent)
 				.range([margin.left, width - margin.right]);
+
 			var xScaleLog = d3.scaleLog()
 				.domain(xExtent)
 				.range([margin.left, width - margin.right]);
+
 			var xScale = xScaleLinear;
+			
 			var yScale = d3.scaleLinear()
 				.domain(yExtent)
 				.range([height - margin.bottom, margin.top]);
@@ -76,7 +79,7 @@
 				.append("circle")
 				.attr("cx", function(d) { return xScale(d.income) })
 				.attr("cy", function(d) { return yScale(d.lifeExpectancy) })
-				.attr("r", 10)
+				.attr("r", 7)
 				.attr("class", "circle");
 
 			// axes
@@ -89,7 +92,7 @@
 				.attr("transform", "translate(" + [margin.left, 0] + ")");
 
 
-			// title
+			// titles
 			var title = svg.append("text")
 				.text("The Health and Wealth of Nations, 2009")
 				.attr("class", "title")
@@ -112,7 +115,7 @@
 				.on("click", function() {
 					if (xScale == xScaleLinear) {
 						xScale = xScaleLog;
-						xAxis.scale(xScale).ticks(10, ".0f")
+						xAxis.scale(xScale).ticks(10, ".0f");
 						xTitle.text("income per capita, inflation adjusted (dollars)");
 					} else if (xScale == xScaleLog) {
 						xScale = xScaleLinear;
@@ -125,9 +128,7 @@
 						.transition()
 						.duration(1000)
 						.attr("cx", function(d) { return xScale(d.income) })
-						.attr("cy", function(d) { return yScale(d.lifeExpectancy) })
-						.attr("r", 10)
-						.attr("class", "circle");
+						.attr("cy", function(d) { return yScale(d.lifeExpectancy) });
 
 					axisX.transition()
 						.duration(1000)

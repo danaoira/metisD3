@@ -23,10 +23,9 @@
 			fill: #808080;
 		}
 
-		.bar, .circle {
+		.bar {
 			fill: pink;
-			fill-opacity: 0.5;
-			stroke: #c0c0c0;
+			fill-opacity: 1;
 		}
 	</style>
 </head>
@@ -46,12 +45,15 @@
 			var yExtent = d3.extent(data, function(d) { return d.lifeExpectancy });
 
 			// scales
+			var heightScale = d3.scaleLinear()
+				.domain(yExtent)
+				.range([0, height - margin.bottom - margin.top]);
 			var xScale = d3.scaleLinear()
 				.domain(xExtent)
 				.range([margin.left, width - margin.right]);
 			var yScale = d3.scaleLinear()
 				.domain(yExtent)
-				.range([margin.top, height - margin.bottom]);
+				.range([height - margin.bottom, margin.top]);
 
 			// axes
 			var xAxis = d3.axisBottom()
@@ -70,15 +72,35 @@
 				.data(data)
 				.enter()
 				.append("rect")
-				.attr("x", function(d, i) { return xScale(i * 3) })
-				.attr("y", function(d) { return height - d.lifeExpectancy })
+				.attr("x", function(d, i) { return xScale(d.income) })
+				.attr("y", function(d) { return yScale(d.lifeExpectancy) })
 				.attr("width", 3)
-				.attr("height", function(d) { return d.lifeExpectancy })
+				.attr("height", function(d) { return heightScale(d.lifeExpectancy) })
 				.attr("class", "bar");
 
 			// axes
+			var axisX = svg.append("g")
+				.call(xAxis)
+				.attr("transform", "translate(" + [0, height - margin.bottom] + ")");
+			var axisY = svg.append("g")
+				.call(yAxis)				
+				.attr("transform", "translate(" + [margin.left, 0] + ")");
 
 			// titles
+			var title = svg.append("text")
+				.text("The Wealth & Health of Nations, 2009")
+				.attr("transform", "translate(" + [margin.left + width * 0.5, margin.top * 0.65] + ")")
+				.attr("text-anchor", "middle")
+				.attr("class", "title");
+			var xTitle = axisX.append("text")
+				.text("income per capita (dollars)")
+				.attr("transform", "translate(" + [width - margin.right, 0 - margin.bottom * 0.5] + ")")
+				.attr("text-anchor", "end")
+				.attr("class", "axis");
+			var yTitle = axisY.append("text")
+				.text("life expectancy (years)")
+				.attr("transform", "translate(" + [margin.left * 0.5, margin.top] + ") rotate(" + -90 + ")")
+				.attr("class", "axis");
 		});
 	</script>
 </body>

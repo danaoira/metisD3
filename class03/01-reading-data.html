@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<head>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<style>
+    	body { 
+    		margin: 0;
+    		position: fixed;
+    		top: 0;
+    		right: 0;
+    		bottom: 0;
+    		left: 0;
+		}
+	</style>
+</head>
+<body>
+	<script>
+		var countries = "/data/countries.json";
+		var literacy = "/data/literacy.xml";
+		var nations = "/data/nations.json";
+		var poverty = "/data/poverty.csv";
+
+		d3.json(countries, callback);
+		function callback(error, json_data) {
+			if (error) throw error;
+			console.log(json_data);
+		}
+	</script>
+</body>
+</html>

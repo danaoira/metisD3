@@ -39,18 +39,50 @@
 		d3.json(countries, function(error, json) {
 			if (error) throw error;
 
+			// vars
+			var width = 960;
+			var height = 500;
+			var margin = { top: 30, right: 30, bottom: 30, left: 30 };
+
+			// data
 			data = json;
 			total_area = d3.nest()
 				.key(function(d) { return d.region })
 				.rollup(function(leaves) { return d3.sum(leaves, function(d) { return d.area }) })
-				.object(data);
-			console.log(total_area);
+				.entries(data);
 			subregion_area = d3.nest()
 				.key(function(d) { return d.region })
 				.key(function(d) { return d.subregion })
 				.rollup(function(leaves) { return d3.sum(leaves, function(d) { return d.area }) })
-				.object(data);
-			console.log(subregion_area);
+				.entries(data);
+
+			// min-max
+			var xExtent = d3.extent(total_area, function(d) { return d.value });
+
+			// scales
+			var xScale = d3.scaleLinear()
+				.range([0, width - margin.right]);
+			var yScale = d3.scaleOrdinal();
+
+			// axes
+			var xAxis = d3.axisBottom()
+				.scale(xScale);
+			var yAxis = d3.axisLeft()
+				.scale(yScale);
+
+			// svg
+			var svg = d3.select("body")
+				.append("svg")
+				.attr("width", width)
+				.attr("height", height);
+
+			// rects
+			var rect = svg.selectAll("rect")
+				.data(total_area)
+
+			// titles
+			var title = ""
+
 		})
 	</script>
 </body>

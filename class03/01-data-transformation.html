@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<head>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<script src="js/topojson.min.js"></script>
+	<script src="js/datamaps.world.hires.min.js"></script>
+	<style>
+    	body { 
+    		margin: 0;
+    		position: fixed;
+    		top: 0;
+    		right: 0;
+    		bottom: 0;
+    		left: 0;
+		}
+
+		.title {
+			font-family: "Georgia";
+			font-size: 32px;
+			fill: #000;
+		}
+
+		.axis {
+			font-family: "Arial";
+			font-size: 11px;
+			fill: #808080;
+		}
+
+		.bar {
+			fill: pink;
+			fill-opacity: 1;
+		}
+	</style>
+</head>
+<body>
+	<script>
+		var solar = "data/solar.csv";
+		// var lunar = "data/lunar.csv";
+		d3.csv("solar", function(error, csv)) {
+			if (error) throw error;
+		}
+
+		// vars
+		var data = solar;
+		var width = 960;
+		var height = 500;
+	</script>
+</body>
+</html>

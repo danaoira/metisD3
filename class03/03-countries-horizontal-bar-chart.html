@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<head>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+
+	<style>
+    	body { 
+    		margin: 0;
+    		position: fixed;
+    		top: 0;
+    		right: 0;
+    		bottom: 0;
+    		left: 0;
+		}
+
+		.title {
+			font-family: "Georgia";
+			font-size: 32px;
+			fill: #000;
+		}
+
+		.axis {
+			font-family: "Arial";
+			font-size: 11px;
+			fill: #808080;
+		}
+
+		.bar {
+			fill: pink;
+			fill-opacity: 1;
+		}
+	</style>
+</head>
+<body>
+	<script>
+		var countries = "data/countries.json";
+		var nations = "data/nations.json";
+		var poverty = "data/poverty.csv";
+
+		// vars
+		var width = 960;
+		var height = 500;
+		var margin = { top: 30, right: 30, bottom: 30, left: 30 };
+		var w = width - margin.left - margin.right;
+		var h = height - margin.top - margin.bottom;
+
+		var svg = d3.select("body")
+			.append("svg")
+			.attr("width", width)
+			.attr("height", height);
+		var g = svg.append("g")
+			.attr("transform", "translate(0, 0)");
+
+		d3.json(countries, function(error, json) {
+			if (error) throw error;
+
+			// data
+			data = json;
+			total_area = d3.nest()
+				.key(function(d) { return d.region })
+				.rollup(function(leaves) { return d3.sum(leaves, function(d) { return d.area }) })
+				.entries(data);
+			console.log(total_area);
+			// subregion_area = d3.nest()
+			// 	.key(function(d) { return d.region })
+			// 	.key(function(d) { return d.subregion })
+			// 	.rollup(function(leaves) { return d3.sum(leaves, function(d) { return d.area }) })
+			// 	.entries(data);
+
+			// min-max
+			var xExtent = d3.extent(total_area, function(d) { return d.value });
+
+			// scales
+			var x = d3.scaleLinear()
+				.domain([0, xExtent[1]])
+				.range([0, w]);
+			var y = d3.scaleBand()
+				.range([h, 0]);
+
+			// axes
+			var xAxis = d3.axisBottom(x);
+			var yAxis = d3.axisLeft(y)
+				.tickSize(w);
+
+			// draw axes
+			g.append("g")
+				.attr("transform", "translate(0, " + h + ")")
+				.call(x);
+			g.append("g")
+				.attr("transform", "translate(" + w + ")")
+				.call(y);
+
+			// rects
+			var bar = svg.selectAll("rect")
+				.data(total_area)
+				.enter()
+				.append("rect")
+				.attr("x", 0)
+				.attr("y", function(d, i) { return i * height / total_area.length })
+				.attr("width", function(d) { return x(d.value) })
+				.attr("height", function(d) { return y.bandwidth() / total_area.length } )
+				.attr("fill", "pink");
+
+			// titles
+			var title = "";
+
+		})
+	</script>
+</body>
+</html>

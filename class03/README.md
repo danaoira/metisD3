@@ -38,7 +38,6 @@
 	- name = d3.nest().key(function(d) { return d.name.official }).object(countries)
 	- d3.nest().key(function(d) { return d.region }).key(function(d) { return d.subregion }).rollup(function(leaves) { return d3.sum(leaves, function(d) { return d.area }) }).entries(countries)
 
-
 - Homework
 	- Play with D3.nest
 	- Make a visualization with the nested data

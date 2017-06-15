@@ -45,12 +45,10 @@
 			var yExtent = d3.extent(data, function(d) { return d.lifeExpectancy });
 
 			// scales
-			var heightScale = d3.scaleLinear()
-				.domain(yExtent)
-				.range([0, height - margin.bottom - margin.top]);
 			var xScale = d3.scaleLinear()
 				.domain(xExtent)
 				.range([margin.left, width - margin.right]);
+
 			var yScale = d3.scaleLinear()
 				.domain(yExtent)
 				.range([height - margin.bottom, margin.top]);

@@ -39,7 +39,7 @@
 		// vars
 		var width = 960;
 		var height = 500;
-		var margin = { top: 30, right: 30, bottom: 30, left: 30 };
+		var margin = { top: 30, right: 30, bottom: 30, left: 100 };
 		var w = width - margin.left - margin.right;
 		var h = height - margin.top - margin.bottom;
 
@@ -52,9 +52,10 @@
 
 		d3.json(countries, function(error, json) {
 			if (error) throw error;
-
+			console.log(json);
+			
 			// data
-			data = json;
+			var data = json;
 			total_area = d3.nest()
 				.key(function(d) { return d.region })
 				.rollup(function(leaves) { return d3.sum(leaves, function(d) { return d.area }) })
@@ -72,33 +73,33 @@
 			// scales
 			var x = d3.scaleLinear()
 				.domain([0, xExtent[1]])
-				.range([0, w]);
-			var y = d3.scaleBand()
-				.range([h, 0]);
+				.range([margin.left, width - margin.right]);
+			var y = d3.scaleBand(y)
+				.range([margin.top, height - margin.bottom]);
 
 			// axes
 			var xAxis = d3.axisBottom(x);
 			var yAxis = d3.axisLeft(y)
 				.tickSize(w);
 
-			// draw axes
-			g.append("g")
-				.attr("transform", "translate(0, " + h + ")")
-				.call(x);
-			g.append("g")
-				.attr("transform", "translate(" + w + ")")
-				.call(y);
-
 			// rects
 			var bar = svg.selectAll("rect")
 				.data(total_area)
 				.enter()
 				.append("rect")
-				.attr("x", 0)
+				.attr("x", margin.left)
 				.attr("y", function(d, i) { return i * height / total_area.length })
 				.attr("width", function(d) { return x(d.value) })
 				.attr("height", function(d) { return y.bandwidth() / total_area.length } )
-				.attr("fill", "pink");
+				.attr("class", "bar");
+
+			// draw axes
+			svg.append("g")
+				.attr("transform", "translate(0, " + h + ")")
+				.call(xAxis);
+			svg.append("g")
+				.attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
+				.call(yAxis);
 
 			// titles
 			var title = "";

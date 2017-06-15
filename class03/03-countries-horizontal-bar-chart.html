@@ -36,26 +36,14 @@
 		var nations = "data/nations.json";
 		var poverty = "data/poverty.csv";
 
-		// vars
-		var width = 960;
-		var height = 500;
-		var margin = { top: 30, right: 30, bottom: 30, left: 100 };
-		var w = width - margin.left - margin.right;
-		var h = height - margin.top - margin.bottom;
-
-		var svg = d3.select("body")
-			.append("svg")
-			.attr("width", width)
-			.attr("height", height);
-		var g = svg.append("g")
-			.attr("transform", "translate(0, 0)");
-
 		d3.json(countries, function(error, json) {
 			if (error) throw error;
-			console.log(json);
-			
+			create_svg(json);
+		})
+
+		function create_svg(data) {
 			// data
-			var data = json;
+			var data = data;
 			total_area = d3.nest()
 				.key(function(d) { return d.region })
 				.rollup(function(leaves) { return d3.sum(leaves, function(d) { return d.area }) })
@@ -66,6 +54,20 @@
 			// 	.key(function(d) { return d.subregion })
 			// 	.rollup(function(leaves) { return d3.sum(leaves, function(d) { return d.area }) })
 			// 	.entries(data);
+
+			// vars
+			var width = 960;
+			var height = 500;
+			var margin = { top: 30, right: 30, bottom: 30, left: 100 };
+			var w = width - margin.left - margin.right;
+			var h = height - margin.top - margin.bottom;
+
+			var svg = d3.select("body")
+				.append("svg")
+				.attr("width", width)
+				.attr("height", height);
+			var g = svg.append("g")
+				.attr("transform", "translate(0, 0)");
 
 			// min-max
 			var xExtent = d3.extent(total_area, function(d) { return d.value });
@@ -104,7 +106,7 @@
 			// titles
 			var title = "";
 
-		})
+		}
 	</script>
 </body>
 </html>

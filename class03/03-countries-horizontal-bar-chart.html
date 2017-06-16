@@ -76,7 +76,7 @@
 			var x = d3.scaleLinear()
 				.domain([0, xExtent[1]])
 				.range([margin.left, width - margin.right]);
-			var y = d3.scaleBand(y)
+			var y = d3.scaleBand()
 				.range([margin.top, height - margin.bottom]);
 
 			// axes
@@ -92,7 +92,7 @@
 				.attr("x", margin.left)
 				.attr("y", function(d, i) { return i * height / total_area.length })
 				.attr("width", function(d) { return x(d.value) })
-				.attr("height", function(d) { return y.bandwidth() / total_area.length } )
+				.attr("height", function(d) { return y.bandwidth() } )
 				.attr("class", "bar");
 
 			// draw axes

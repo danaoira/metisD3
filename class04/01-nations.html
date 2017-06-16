@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<head>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+
+	<style>
+    	body { 
+    		margin: 0;
+    		position: fixed;
+    		top: 0;
+    		right: 0;
+    		bottom: 0;
+    		left: 0;
+		}
+
+		.title {
+			font-family: "Georgia";
+			font-size: 32px;
+			fill: #000;
+		}
+
+		.axis {
+			font-family: "Arial";
+			font-size: 11px;
+			fill: #808080;
+		}
+
+		.bar {
+			fill: pink;
+			fill-opacity: 1;
+		}
+	</style>
+</head>
+<body>
+	<script>
+		var selectByYear = function(nation, attr) {
+			return d3.nest()
+					.key(function(d) { 
+						return d[0];
+					}).rollup(function(leaves) {
+						var temp = {};
+						temp[attr] = leaves[0][1];
+						return temp;
+					}).map(nation[attr]);
+		} 
+
+		d3.json("nations.json", function(error, nations) {
+			if (error) throw error;
+			var temp = [];
+			console.log(nations[0]);
+			nations.forEach(function(nation) {
+				var country = nation.name;
+				var region = nation.region;
+
+				var incomeByYear = nation.income.map(function(i) {
+					return {
+								income: i[1], 
+								year: i[0], 
+								region: nation.region, 
+								country: nation.name, 
+								lifeExpectancy: null, 
+								population: null 
+							}
+				});
+				temp.push(incomeByYear);
+				// console.log(temp);
+				// var lifeExpectancyByYear = nation.income.map(function(i) {
+				// 	return { lifeExpectancy: i[1], year: i[0] }
+				// });
+				// var populationByYear = nation.income.map(function(i) {
+				// 	return { population: i[1], year: i[0] }
+				// });
+
+				// var nested = d3.nest()
+				// 	.key(function(d) {
+				// 		return d.year
+				// 	}).entries(d3.merge([incomeByYear, lifeExpectancyByYear, populationByYear]))
+				// 	.map(function(entry) {
+				// 		var x;
+				// 		entry.values.forEach(function(value) {
+
+				// 		})
+				// 	});
+				// console.log(nested);
+
+				// var lifeExpectancyByYear = nation.lifeExpectancy.map(function(i) {
+				// 	raturn { lifeExpectancy: i[0], }
+				// })
+				// var incomeByYear = selectByYear(nation, 'income');
+				// var lifeExpectancyByYear = selectByYear(nation, 'lifeExpectancy');
+				// var populationByYear = selectByYear(nation, 'population');
+			// 	var something;
+			// 	something = d3.nest()
+			// 		.key(function(d) { 
+			// 			return d[0];
+			// 		}).rollup(function(leaves) {
+			// 			return { 
+			// 				income: leaves[0][1]
+			// 				country: 
+			// 			};
+			// 		}).map(nation.income);
+			// console.log(something);
+			// console.log(temp[100]);
+			});
+		});
+	</script>
+</body>
+</html>

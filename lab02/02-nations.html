@@ -49,47 +49,64 @@
 				}
 			});
 		};
+
+		var filterByYear = function(input, year) {
+			var result = [];
+
+			input.forEach(function(i) {
+				var country = {
+					year: null,
+					country: null,
+					region: null,
+					income: null,
+					lifeExpectancy: null,
+					population: null
+				}
+
+				getIncome = getAttrByYear(i, country, year, "income");
+				getLifeExpectancy = getAttrByYear(i, country, year, "lifeExpectancy");
+				getPopulation = getAttrByYear(i, country, year, "population");
+				country.country = i.name;
+				country.region = i.region;
+				country.year = year;
+				result.push(country);
+			});
+			return result;
+		};
 		
 		d3.json("nations.json", function(error, data) {
-			var temp = [];
 			if (error) return error;
 			console.log(data);		// original data
 
 			// data
-			var filterByYear = function(year) {
-				data.forEach(function(i) {
-					var country = {
-						year: null,
-						country: null,
-						region: null,
-						income: null,
-						lifeExpectancy: null,
-						population: null
-					}
-
-					getIncome = getAttrByYear(i, country, year, "income");
-					getLifeExpectancy = getAttrByYear(i, country, year, "lifeExpectancy");
-					getPopulation = getAttrByYear(i, country, year, "population");
-					country.country = i.name;
-					country.region = i.region;
-					country.year = year;
-					temp.push(country);
-				});
-				console.log(temp);	// filtered data
-			};
-			filterByYear(1989);
-		});
+			newData = filterByYear(data, 1989);
+			console.log(newData);	// filtered data
 
 			// ------------------------------------------------------------
 			// min-max
 				// income
+				xExtent = d3.extent(newData, function(d) { return d.income });
+				console.log(xExtent);
 				// lifeExpectancy
+				yExtent = d3.extent(newData, function(d) { return d.lifeExpectancy });
+				console.log(yExtent);
 
 			// scales
 				// xScale : income
+				xScale = d3.scaleLinear()
+					.domain()
+					.range();
 				// yScale : lifeExpectancy
+				yScale = d3.scaleLinear()
+					.domain()
+					.range();
 
 			// axes
+				xAxis = d3.axisBottom()
+					.scale(xScale);
+				yAxis = d3.axisLeft()
+					.scale(yScale);
+		});
 	</script>
 </body>
 </html>

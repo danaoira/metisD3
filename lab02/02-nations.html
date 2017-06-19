@@ -41,6 +41,14 @@
 			Bonus: use the raw data from class 3 and create the final dataset yourself. Add axes and labels.
 			For extra practice: visualize the barley yield data.
 		*/
+
+		var filterAttr = function(input, output, year, attr) {
+			input[attr].forEach(function(d) { 
+				if (d[0] === year) { 
+					return output[attr] = d[1];
+				}
+			});
+		};
 		
 		d3.json("nations.json", function(error, data) {
 			var temp = [];
@@ -51,38 +59,26 @@
 			var filterByYear = function(year) {
 				data.forEach(function(i) {
 					var country = {
+						year: null,
 						country: null,
 						region: null,
 						income: null,
 						lifeExpectancy: null,
-						population: null,
-						year: null
+						population: null
 					}
-					i.income.forEach(function(d) { 
-						if (d[0] === year) { 
-							country.income = d[1] 
-						}
-					});
-					i.lifeExpectancy.forEach(function(d) { 
-						if (d[0] === year) { 
-							country.lifeExpectancy = d[1]
-						}
-					});
-					i.population.forEach(function(d) { 
-						if (d[0] === year) { 
-							country.population = d[1] 
-						}
-					});
+
+					getIncome = filterAttr(i, country, year, "income");
+					getLifeExpectancy = filterAttr(i, country, year, "lifeExpectancy");
+					getPopulation = filterAttr(i, country, year, "population");
 					country.country = i.name;
 					country.region = i.region;
 					country.year = year;
 					temp.push(country);
 				});
-				console.log(temp);
+				console.log(temp);	// filtered data
 			};
 			filterByYear(1989);
 		});
-
 
 			// ------------------------------------------------------------
 			// min-max

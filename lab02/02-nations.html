@@ -99,7 +99,7 @@
 			console.log(data);		// original data
 
 			// data
-			newData = filterByYear(data, 1989);
+			newData = filterByYear(data, 2000);
 			console.log(newData);	// filtered data
 
 			// graph -----------------------------------------------------------
@@ -122,20 +122,21 @@
 			console.log("rExtent = ", rExtent);
 
 			// scales
-			var xScale = d3.scaleLinear()
+			var xScale = d3.scaleLog()
 				.domain(xExtent)
 				.range([0, width + margin.left]);
 			var yScale = d3.scaleLinear()
-				.domain(yExtent)
+				.domain([0, yExtent[1]])
 				.range([height, 0]);
-			var rScale = d3.scaleLinear()
+			var rScale = d3.scaleSqrt()
 				.domain(rExtent)
-				.range([0, 100]);
+				.range([0, 50]);
 
 			// axes
-			var xAxis = d3.axisBottom()
-				.scale(xScale);
-			var yAxis = d3.axisLeft()
+			var x = d3.axisBottom()
+				.scale(xScale)
+				.ticks(10, ".0f");
+			var y = d3.axisLeft()
 				.scale(yScale);
 
 			// svg
@@ -152,16 +153,26 @@
 				.enter()
 				.append("circle")
 				.attr("class", "circle")
-				.attr("r", function(d) { return rScale(d.population) })
 				.attr("cx", function(d) { return xScale(d.income) })
 				.attr("cy", function(d) { return yScale(d.lifeExpectancy) })
+				.attr("r", function(d) { return rScale(d.population) })
 				.attr("id", function(d) { return d.country });
 
-			svg.append("g")
-				.call(xAxis)
+			// draw axes and labels
+			var xAxis = svg.append("g")
+				.call(x)
 				.attr("transform", "translate(0, " + height + ")");
-			svg.append("g")
-				.call(yAxis);
+			var yAxis = svg.append("g")
+				.call(y);
+			var xLabel = xAxis.append("text")
+				.text("income per capita, inflation adjusted (dollars)")
+				.attr("class", "axis")
+				.attr("transform", "translate(" + (width + margin.left) + ", " + 0.5 * -margin.bottom + ")")
+				.attr("text-anchor", "end");
+			var yLabel = yAxis.append("text")
+				.text("life expectancy (years)")
+				.attr("class", "axis")
+				.attr("transform", "translate(" + (margin.left * 0.85) + ", 0) rotate(-90)")
 		});
 	</script>
 </body>

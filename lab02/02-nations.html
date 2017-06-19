@@ -39,25 +39,52 @@
 						color  = region
 
 			Bonus: use the raw data from class 3 and create the final dataset yourself. Add axes and labels.
-			For extra practice: visualize the barley yield data, instructions here.
+			For extra practice: visualize the barley yield data.
 		*/
-		var nationData = function(data) {
-			var result = {
-				country: data.name,
-				region: data.region,					// color
-				income: data.income,					// x
-				lifeExpectancy: data.lifeExpectancy,	// y
-				population: data.population				// r
-			};
-			return result;
-		}
 		
 		d3.json("nations.json", function(error, data) {
+			var temp = [];
 			if (error) return error;
-			console.log(data);
+			console.log(data);		// original data
 
 			// data
+			var filterByYear = function(year) {
+				data.forEach(function(i) {
+					var country = {
+						country: null,
+						region: null,
+						income: null,
+						lifeExpectancy: null,
+						population: null,
+						year: null
+					}
+					i.income.forEach(function(d) { 
+						if (d[0] === year) { 
+							country.income = d[1] 
+						}
+					});
+					i.lifeExpectancy.forEach(function(d) { 
+						if (d[0] === year) { 
+							country.lifeExpectancy = d[1]
+						}
+					});
+					i.population.forEach(function(d) { 
+						if (d[0] === year) { 
+							country.population = d[1] 
+						}
+					});
+					country.country = i.name;
+					country.region = i.region;
+					country.year = year;
+					temp.push(country);
+				});
+				console.log(temp);
+			};
+			filterByYear(1989);
+		});
 
+
+			// ------------------------------------------------------------
 			// min-max
 				// income
 				// lifeExpectancy
@@ -67,7 +94,6 @@
 				// yScale : lifeExpectancy
 
 			// axes
-		});
 	</script>
 </body>
 </html>

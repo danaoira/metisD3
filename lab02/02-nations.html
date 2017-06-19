@@ -42,7 +42,7 @@
 			For extra practice: visualize the barley yield data.
 		*/
 
-		var filterAttr = function(input, output, year, attr) {
+		var getAttrByYear = function(input, output, year, attr) {
 			input[attr].forEach(function(d) { 
 				if (d[0] === year) { 
 					return output[attr] = d[1];
@@ -67,9 +67,9 @@
 						population: null
 					}
 
-					getIncome = filterAttr(i, country, year, "income");
-					getLifeExpectancy = filterAttr(i, country, year, "lifeExpectancy");
-					getPopulation = filterAttr(i, country, year, "population");
+					getIncome = getAttrByYear(i, country, year, "income");
+					getLifeExpectancy = getAttrByYear(i, country, year, "lifeExpectancy");
+					getPopulation = getAttrByYear(i, country, year, "population");
 					country.country = i.name;
 					country.region = i.region;
 					country.year = year;

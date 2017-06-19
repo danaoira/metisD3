@@ -24,9 +24,10 @@
 			fill: #808080;
 		}
 
-		.bar {
+		.circle {
 			fill: pink;
-			fill-opacity: 1;
+			fill-opacity: 0.50;
+			stroke: #c0c0c0;
 		}
 	</style>
 </head>
@@ -39,8 +40,7 @@
 						color  = region
 
 			Bonus: use the raw data from class 3 and create the final dataset yourself. Add axes and labels.
-			For extra practice: visualize the barley yield data.
-		*/
+			For extra practice: visualize the barley yield data. */
 
 		var getAttrByYear = function(input, output, year, attr) {
 			input[attr].forEach(function(d) { 
@@ -73,6 +73,18 @@
 			});
 			return result;
 		};
+
+		var getMaxXY = function(input, attr) {
+			var result = 0;
+			input.forEach(function(d) {
+				d[attr].forEach(function(i) {
+					if (i[1] > val) {
+						val = i[1];
+					}
+				});
+			});
+			return result;
+		};
 		
 		d3.json("nations.json", function(error, data) {
 			if (error) return error;
@@ -83,29 +95,50 @@
 			console.log(newData);	// filtered data
 
 			// ------------------------------------------------------------
+
+			// vars
+			var margin = { top: 20, right: 20, bottom: 20, left: 20 };
+			var width = 960 - margin.left - margin.right;
+			var height = 500 - margin.top - margin.bottom;
+
 			// min-max
-				// income
-				xExtent = d3.extent(newData, function(d) { return d.income });
-				console.log(xExtent);
-				// lifeExpectancy
-				yExtent = d3.extent(newData, function(d) { return d.lifeExpectancy });
-				console.log(yExtent);
+			var xExtent = d3.extent(newData, function(d) { return d.income });
+			var yExtent = d3.extent(newData, function(d) { return d.lifeExpectancy });
+			var rExtent = d3.extent(newData, function(d) { return d.population });
 
 			// scales
-				// xScale : income
-				xScale = d3.scaleLinear()
-					.domain()
-					.range();
-				// yScale : lifeExpectancy
-				yScale = d3.scaleLinear()
-					.domain()
-					.range();
+			var xScale = d3.scaleLog()
+				.domain(xExtent)
+				.range([0, width + margin.left]);
+			var yScale = d3.scaleLinear()
+				.domain(yExtent)
+				.range([height + margin.bottom, 0]);
+			var rScale = d3.scaleLinear()
+				.domain(rExtent)
+				.range([0, 100]);
 
 			// axes
-				xAxis = d3.axisBottom()
-					.scale(xScale);
-				yAxis = d3.axisLeft()
-					.scale(yScale);
+			var xAxis = d3.axisBottom()
+				.scale(xScale);
+			var yAxis = d3.axisLeft()
+				.scale(yScale);
+
+			// svg
+			var svg = d3.select("body")
+				.append("svg")
+				.attr("width", width + margin.left + margin.right)
+				.attr("height", height + margin.top + margin.bottom);
+
+			// circles
+			var dataPts = svg.selectAll("circle")
+				.data(newData)
+				.enter()
+				.append("circle")
+				.attr("class", "circle")
+				.attr("r", function(d) { return rScale(d.population) })
+				.attr("cx", function(d) { return xScale(d.income) })
+				.attr("cy", function(d) { return yScale(d.lifeExpectancy) })
+				.attr("id", function(d) { return d.country });
 		});
 	</script>
 </body>

@@ -29,7 +29,7 @@
 			stroke: #c0c0c0;
 		}
 
-		.domain{
+		.domain {
 			stroke: #c0c0c0;
 		}
 
@@ -48,6 +48,8 @@
 
 			Bonus: use the raw data from class 3 and create the final dataset yourself. Add axes and labels.
 			For extra practice: visualize the barley yield data. */
+		var scales = {};
+		var year = 1950;
 
 		var getAttrByYear = function(input, output, year, attr) {
 			input[attr].forEach(function(d) { 
@@ -92,13 +94,37 @@
 			});
 			return result;
 		};
+
+		var updateData = function(data, svg, scales, year) {
+			var newData = filterByYear(data, year);
+
+			var circle = svg.selectAll("circle").data(newData);
+			
+			circle.exit().remove();
+
+			circle.enter()
+				.append("circle")
+				.merge(circle)
+				.attr("cx", function(d) { return scales.xSca(d.income) })
+				.attr("cy", function(d) { return scales.ySca(d.lifeExpectancy) })
+				.attr("r", function(d) { return scales.rSca(d.population) })
+				.attr("id", function(d) { return d.country })
+				.attr("fill", function(d) { return scales.cSca(d.region) })
+				.attr("class", "circle");
+			return year + 1;
+
+			// if (r < 0) {
+			// 	get.debugger;
+			// }
+		};
 		
 		d3.json("nations.json", function(error, data) {
 			if (error) return error;
 			console.log(data);		// original data
 
 			// data
-			newData = filterByYear(data, 1800);
+			// var year = 1950;
+			newData = filterByYear(data, year);
 			console.log(newData);	// filtered data
 
 			// vars -----------------------------------------------------------
@@ -113,25 +139,31 @@
 			var rExtent = d3.extent(newData, function(d) { return d.population });
 			var colorDomain = d3.nest().key(function(d) { return d.region }).object(newData);
 			console.log("xExtent = ", xExtent, "yExtent = ", yExtent, "rExtent = ", rExtent);
-			// console.log(colorRange);
-			// var xMax = getMaxAttr(data, "income");
-			// var yMax = getMaxAttr(data, "lifeExpectancy");
-			// var rMax = getMaxAttr(data, "population");
-			// console.log("xMax = ", xMax, "yMax = ", yMax, "rMax = ", rMax);
 
 			// scales
 			var xScale = d3.scaleLog()
 				.domain(xExtent)
 				.range([0, width + margin.left]);
 			var yScale = d3.scaleLinear()
-				.domain([0, yExtent[1]])
+				.domain([0, 85])
 				.range([height, 0]);
 			var rScale = d3.scaleSqrt()
 				.domain(rExtent)
-				.range([0, 50]);
+				.range([0,50]);
 			var colorScale = d3.scaleOrdinal()
 				.domain(colorDomain)
 				.range(["Pink", "LightCyan", "Gainsboro", "Thistle", "MintCream", "LemonChiffon"]);
+
+			scales = {
+				xExt : xExtent,
+				yExt : yExtent,
+				rExt : rExtent,
+				color: colorDomain,
+				xSca : xScale,
+				ySca : yScale,
+				rSca : rScale,
+				cSca : colorScale
+			};
 
 			// axes
 			var x = d3.axisBottom()
@@ -150,18 +182,6 @@
 				.append("g")
 				.attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
 
-			// circles
-			var dataPts = svg.selectAll("circle")
-				.data(newData)
-				.enter()
-				.append("circle")
-				.attr("class", "circle")
-				.attr("cx", function(d) { return xScale(d.income) })
-				.attr("cy", function(d) { return yScale(d.lifeExpectancy) })
-				.attr("r", function(d) { return rScale(d.population) })
-				.attr("id", function(d) { return d.country })
-				.attr("fill", function(d) { return colorScale(d.region) } );
-
 			// axes
 			var xAxis = svg.append("g")
 				.call(x)
@@ -178,7 +198,15 @@
 			var yLabel = yAxis.append("text")
 				.text("life expectancy (years)")
 				.attr("class", "axis")
-				.attr("transform", "translate(" + (margin.left * 0.85) + ", 0) rotate(-90)")
+				.attr("transform", "translate(" + (margin.left * 0.85) + ", 0) rotate(-90)");
+
+			window.svg = svg;
+			var interval = window.setInterval(function() {
+				if (year > 2009) {
+					year = 1950;
+				}
+				year = updateData(data, svg, scales, year);
+			}, 1000);
 		});
 	</script>
 </body>

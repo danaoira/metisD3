@@ -25,8 +25,7 @@
 		}
 
 		.circle {
-			fill: pink;
-			fill-opacity: 0.50;
+			fill-opacity: 0.75;
 			stroke: #c0c0c0;
 		}
 
@@ -102,24 +101,23 @@
 			newData = filterByYear(data, 2000);
 			console.log(newData);	// filtered data
 
-			// graph -----------------------------------------------------------
+			// vars -----------------------------------------------------------
 
-			// vars
 			var margin = { top: 20, right: 20, bottom: 20, left: 20 };
 			var width = 960 - margin.left - margin.right;
 			var height = 500 - margin.top - margin.bottom;
 
 			// min-max
-			var xMax = getMaxAttr(data, "income");
-			var yMax = getMaxAttr(data, "lifeExpectancy");
-			var rMax = getMaxAttr(data, "population");
-			console.log("xMax = ", xMax, "yMax = ", yMax, "rMax = ", rMax);
 			var xExtent = d3.extent(newData, function(d) { return d.income });
 			var yExtent = d3.extent(newData, function(d) { return d.lifeExpectancy });
 			var rExtent = d3.extent(newData, function(d) { return d.population });
-			console.log("xExtent = ", xExtent);
-			console.log("yExtent = ", yExtent);
-			console.log("rExtent = ", rExtent);
+			var colorDomain = d3.nest().key(function(d) { return d.region }).object(newData);
+			console.log("xExtent = ", xExtent, "yExtent = ", yExtent, "rExtent = ", rExtent);
+			// console.log(colorRange);
+			// var xMax = getMaxAttr(data, "income");
+			// var yMax = getMaxAttr(data, "lifeExpectancy");
+			// var rMax = getMaxAttr(data, "population");
+			// console.log("xMax = ", xMax, "yMax = ", yMax, "rMax = ", rMax);
 
 			// scales
 			var xScale = d3.scaleLog()
@@ -131,6 +129,9 @@
 			var rScale = d3.scaleSqrt()
 				.domain(rExtent)
 				.range([0, 50]);
+			var colorScale = d3.scaleOrdinal()
+				.domain(colorDomain)
+				.range(["Pink", "LightCyan", "Gainsboro", "Thistle", "MintCream", "LemonChiffon"]);
 
 			// axes
 			var x = d3.axisBottom()
@@ -138,6 +139,8 @@
 				.ticks(10, ".0f");
 			var y = d3.axisLeft()
 				.scale(yScale);
+
+			// graph ----------------------------------------------------------
 
 			// svg
 			var svg = d3.select("body")
@@ -156,14 +159,17 @@
 				.attr("cx", function(d) { return xScale(d.income) })
 				.attr("cy", function(d) { return yScale(d.lifeExpectancy) })
 				.attr("r", function(d) { return rScale(d.population) })
-				.attr("id", function(d) { return d.country });
+				.attr("id", function(d) { return d.country })
+				.attr("fill", function(d) { return colorScale(d.region) } );
 
-			// draw axes and labels
+			// axes
 			var xAxis = svg.append("g")
 				.call(x)
 				.attr("transform", "translate(0, " + height + ")");
 			var yAxis = svg.append("g")
 				.call(y);
+
+			// labels
 			var xLabel = xAxis.append("text")
 				.text("income per capita, inflation adjusted (dollars)")
 				.attr("class", "axis")

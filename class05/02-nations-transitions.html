@@ -49,7 +49,7 @@
 			Bonus: use the raw data from class 3 and create the final dataset yourself. Add axes and labels.
 			For extra practice: visualize the barley yield data. */
 		var scales = {};
-		var year = 1950;
+		var year = 1800;
 
 		var filterByYear = function(input, year) {
 			var result = [];
@@ -84,36 +84,82 @@
 			});
 		};
 
-		var getMaxAttr = function(input, attr) {
-			var result = 0;
+		// var getMaxAttr = function(input, attr) {
+		// 	var result = 0;
+			
+		// 	input.forEach(function(d) {
+		// 		d[attr].forEach(function(i) {
+		// 			if (i[1] > result) {
+		// 				result = i[1];
+		// 			}
+		// 		});
+		// 	});
+
+		// 	return result;
+		// };
+
+		// var getMinAttr = function(input, attr) {
+		// 	var result = 10000000;
+			
+		// 	input.forEach(function(d) {
+		// 		d[attr].forEach(function(i) {
+		// 			if (i[1] < result) {
+		// 				result = i[1];
+		// 			}
+		// 		});
+		// 	});
+
+		// 	return result;
+		// };
+
+		var getMinMax = function(input, attr) {
+			var min = 99999999;
+			var max = 0;
 			
 			input.forEach(function(d) {
 				d[attr].forEach(function(i) {
-					if (i[1] > result) {
-						result = i[1];
+					if (i[1] < min) {
+						min = i[1];
+					}
+					if (i[1] > max) {
+						max = i[1];
 					}
 				});
 			});
 
-			return result;
+			return [min, max];
 		};
 
 		var update = function(data, svg, scales, year) {
 			var newData = filterByYear(data, year);
 
-			var circle = svg.selectAll("circle").data(newData);
-			
-			circle.exit().remove();
+			var selection = svg.selectAll("circle")
+				.data(newData);
 
-			circle.enter()
+			selection.enter()
 				.append("circle")
-				.merge(circle)
-				.attr("cx", function(d) { return scales.xSca(d.income) })
-				.attr("cy", function(d) { return scales.ySca(d.lifeExpectancy) })
-				.attr("r", function(d) { return scales.rSca(d.population) })
+				.merge(selection)
+				.transition()
+				.duration(100)
+				.attr("cx", function(d) { 
+					if (d.income != null) {
+						return scales.xSca(d.income)
+				}})
+				.attr("cy", function(d) {
+					if (d.lifeExpectancy != null) {
+						return scales.ySca(d.lifeExpectancy)
+					}
+				})
+				.attr("r", function(d) {
+					if ((d.income && d.lifeExpectancy && d.population) != null) {
+						return scales.rSca(d.population) 
+					}
+				})
 				.attr("id", function(d) { return d.country })
 				.attr("fill", function(d) { return scales.cSca(d.region) })
 				.attr("class", "circle");
+			
+			selection.exit().remove();
 		};
 		
 		d3.json("nations.json", function(error, data) {
@@ -132,18 +178,21 @@
 			var height = 500 - margin.top - margin.bottom;
 
 			// min-max
-			var xExtent = d3.extent(newData, function(d) { return d.income });
-			var yExtent = d3.extent(newData, function(d) { return d.lifeExpectancy });
-			var rExtent = d3.extent(newData, function(d) { return d.population });
+			var xExtent = getMinMax(data, "income");
+			var yExtent = getMinMax(data, "lifeExpectancy");
+			var rExtent = getMinMax(data, "population");
+			// var xExtent = d3.extent(newData, function(d) { return d.income });
+			// var yExtent = d3.extent(newData, function(d) { return d.lifeExpectancy });
+			// var rExtent = d3.extent(newData, function(d) { return d.population });
 			var colorDomain = d3.nest().key(function(d) { return d.region }).object(newData);
 			console.log("xExtent = ", xExtent, "yExtent = ", yExtent, "rExtent = ", rExtent);
 
 			// scales
 			var xScale = d3.scaleLog()
-				.domain(xExtent)
+				.domain([100, xExtent[1]])
 				.range([0, width + margin.left]);
 			var yScale = d3.scaleLinear()
-				.domain([0, 85])
+				.domain([0, (yExtent[1] + 5)])
 				.range([height, 0]);
 			var rScale = d3.scaleSqrt()
 				.domain(rExtent)
@@ -198,14 +247,15 @@
 				.attr("class", "axis")
 				.attr("transform", "translate(" + (margin.left * 0.85) + ", 0) rotate(-90)");
 
+			// update(data, svg, scales, year);
 			window.svg = svg;
 			var interval = window.setInterval(function() {
 				if (year > 2009) {
-					year = 1950;
+					year = 1800;
 				}
 				update(data, svg, scales, year);
 				year++;
-			}, 1000);
+			}, 500);
 		});
 	</script>
 </body>

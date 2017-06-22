@@ -55,7 +55,7 @@
 			Bonus: use the raw data from class 3 and create the final dataset yourself. Add axes and labels.
 			For extra practice: visualize the barley yield data. */
 		var scales = {};
-		var year = 1950;
+		var year = 1800;
 
 		var filterByYear = function(input, year) {
 			var result = [];
@@ -112,13 +112,14 @@
 			var newData = filterByYear(data, year);
 
 			var selection = svg.selectAll("circle")
-				.data(newData);
+				.data(newData, function(d) { 
+					return d.country;
+				});
 
 			selection.enter()
 				.append("circle")
 				.merge(selection)
 				.transition()
-				.duration(100)
 				.attr("cx", function(d) { 
 					if (d.income != null) {
 						return scales.xSca(d.income)
@@ -161,9 +162,6 @@
 			var xExtent = getMinMax(data, "income");
 			var yExtent = getMinMax(data, "lifeExpectancy");
 			var rExtent = getMinMax(data, "population");
-			// var xExtent = d3.extent(newData, function(d) { return d.income });
-			// var yExtent = d3.extent(newData, function(d) { return d.lifeExpectancy });
-			// var rExtent = d3.extent(newData, function(d) { return d.population });
 			var colorDomain = d3.nest().key(function(d) { return d.region }).object(newData);
 			console.log("xExtent = ", xExtent, "yExtent = ", yExtent, "rExtent = ", rExtent);
 
@@ -176,7 +174,7 @@
 				.range([height, 0]);
 			var rScale = d3.scaleSqrt()
 				.domain(rExtent)
-				.range([0,50]);
+				.range([0,90]);
 			var colorScale = d3.scaleOrdinal()
 				.domain(colorDomain)
 				.range(["Pink", "LightCyan", "Gainsboro", "Thistle", "MintCream", "LemonChiffon"]);
@@ -239,7 +237,7 @@
 				}
 				update(data, svg, scales, year);
 				year++;
-			}, 500);
+			}, 1000);
 		});
 	</script>
 </body>

@@ -36,6 +36,12 @@
 		.tick > line {
 			stroke: #c0c0c0;
 		}
+
+		.year {
+			font-family: "Georgia";
+			font-size: 100px;
+			fill: #d0d0d0;
+		}
 	</style>
 </head>
 <body>
@@ -49,7 +55,7 @@
 			Bonus: use the raw data from class 3 and create the final dataset yourself. Add axes and labels.
 			For extra practice: visualize the barley yield data. */
 		var scales = {};
-		var year = 1800;
+		var year = 1950;
 
 		var filterByYear = function(input, year) {
 			var result = [];
@@ -83,34 +89,6 @@
 				}
 			});
 		};
-
-		// var getMaxAttr = function(input, attr) {
-		// 	var result = 0;
-			
-		// 	input.forEach(function(d) {
-		// 		d[attr].forEach(function(i) {
-		// 			if (i[1] > result) {
-		// 				result = i[1];
-		// 			}
-		// 		});
-		// 	});
-
-		// 	return result;
-		// };
-
-		// var getMinAttr = function(input, attr) {
-		// 	var result = 10000000;
-			
-		// 	input.forEach(function(d) {
-		// 		d[attr].forEach(function(i) {
-		// 			if (i[1] < result) {
-		// 				result = i[1];
-		// 			}
-		// 		});
-		// 	});
-
-		// 	return result;
-		// };
 
 		var getMinMax = function(input, attr) {
 			var min = 99999999;
@@ -158,6 +136,8 @@
 				.attr("id", function(d) { return d.country })
 				.attr("fill", function(d) { return scales.cSca(d.region) })
 				.attr("class", "circle");
+
+			d3.select(".year").text(year);
 			
 			selection.exit().remove();
 		};
@@ -246,12 +226,17 @@
 				.text("life expectancy (years)")
 				.attr("class", "axis")
 				.attr("transform", "translate(" + (margin.left * 0.85) + ", 0) rotate(-90)");
+			var yrLabel = svg.append("text")
+				.text(year)
+				.attr("class", "year")
+				.attr("transform", "translate(" + (width + margin.left) + ", " + (height - margin.bottom * 2.5) + ")")
+				.attr("text-anchor", "end")
 
 			// update(data, svg, scales, year);
 			window.svg = svg;
 			var interval = window.setInterval(function() {
 				if (year > 2009) {
-					year = 1800;
+					year = 1950;
 				}
 				update(data, svg, scales, year);
 				year++;

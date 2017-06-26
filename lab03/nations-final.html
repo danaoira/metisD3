@@ -98,8 +98,9 @@
 			// (in case of extremely messy data)
 			// (never assume data is sorted even though it may be)
 			// and taking the first year values & last year values
-			// to reduce the amount of searches from
-			//		worst case: O(2n) / best case: O(1 + n)
+			// to reduce the amount of searches from..
+			//		worst case: O(2n)
+			//		best case:  O(1 + n)
 			// to O(1 + 1) after the sort
 			var keyMin;
 			var valMin;

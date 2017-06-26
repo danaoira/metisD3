@@ -98,7 +98,7 @@
 			return result;
 		};
 
-		var update = function(data, svg, scales, year) {
+		var updateData = function(data, svg, scales, year) {
 			var newData = filterByYear(data, year);
 
 			var circle = svg.selectAll("circle").data(newData);
@@ -203,7 +203,7 @@
 				if (year > 2009) {
 					year = 1950;
 				}
-				update(data, svg, scales, year);
+				updateData(data, svg, scales, year);
 				year++;
 			}, 1000);
 		});

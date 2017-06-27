@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<head>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+
+	<style>
+    	body { 
+    		margin: 0;
+    		position: fixed;
+    		top: 0;
+    		right: 0;
+    		bottom: 0;
+    		left: 0;
+		}
+
+		.line {
+			fill: none;
+			stroke: pink;
+			stroke-width: 3px;
+		}
+	</style>
+</head>
+<body>
+	<script>
+	var margin = { top: 20, right: 20, bottom: 20, left: 20};
+	var width = 960 - margin.left - margin.right;
+	var height = 500 - margin.top - margin.bottom;
+	var data = [[10,10], [20,70], [50,30], [55,85], [90,90]];
+
+	var x = d3.scaleLinear()
+		.domain([0, 100])
+		.range([0, width]);
+	var y = d3.scaleLinear()
+		.domain([0, 100])
+		.range([height, 0]);
+
+	var line = d3.line()
+		.x(function(d) { return x(d[0]) })
+		.y(function(d) { return y(d[1]) })
+		.curve(d3.curveStep);
+	console.log(line(data));
+
+	var svg = d3.select("body")
+		.append("svg")
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom);
+	var g = svg.append("g")
+		.attr("translate", "transform(" + margin.left + ", " + margin.top + ")");
+
+	var path = svg.append("path")
+		.attr("class", "line")
+		.datum(data)
+		.attr("d", line);
+	</script>
+</body>
+</html>

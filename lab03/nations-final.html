@@ -46,222 +46,43 @@
 </head>
 <body>
 	<script>
-		/*	Input: nations.json
-			Output: 	x-axis = income
-						y-axis = lifeExpectancy
-						radius = population
-						color  = region
+		// global vars
+		var margin = { top: 20, right: 20, bottom: 20, left: 20 };
+		var width = 960 - margin.left - margin.right;
+		var height = 500 - margin.top - margin.bottom;
+/*
+		var setDomain = function(data, x, y) {
+			// x
+			// y
+		}
 
-			Bonus: use the raw data from class 3 and create the final dataset yourself. Add axes and labels.
-			For extra practice: visualize the barley yield data. */
-		var scales = {};
-		var year = 1800;
-
-		var filterByYear = function(input) {
-			var result = [];
-
-			// get min/max years, which will be the range of keys
-			// for each year, create an array of objects for each country w/ data for that year
-
-			input.forEach(function(i) {
-				var country = {
-					year: null,
-					country: null,
-					region: null,
-					income: null,
-					lifeExpectancy: null,
-					population: null
-				}
-
-				var getIncome = getAttrByYear(i, country, year, "income");
-				var getLifeExpectancy = getAttrByYear(i, country, year, "lifeExpectancy");
-				var getPopulation = getAttrByYear(i, country, year, "population");
-				country.country = i.name;
-				country.region = i.region;
-				country.year = year;
-				result.push(country);
-			});
-
+		var setRange = function() {
+			var result = {
+				x: [0, width],
+				y: [height, 0]
+			}
 			return result;
-		};
+		}
 
-		var getAttrByYear = function(input, output, year, attr) {
-			input[attr].forEach(function(d) { 
-				if (d[0] === year) { 
-					return output[attr] = d[1];
-				}
-			});
-		};
+		var setScale = function(domain, range) {
+			var result = {
+				// x: ,
+				// y:
+			}
+			return result;
+		}
 
-		var getMinMax = function(input, attr) {
-			// can be improved by sorting each attribute by their year
-			// (in case of extremely messy data)
-			// (never assume data is sorted even though it may be)
-			// and taking the first year values & last year values
-			// to reduce the amount of searches from..
-			//		worst case: O(2n)
-			//		best case:  O(1 + n)
-			// to O(1 + 1) after the sort
-			var keyMin;
-			var valMin;
-			var keyMax;
-			var valMax;
-			
-			// gets min/max year and min/max attribute
-			// ie. input: 	"income" => d[income] or d.income
-			//     output:  [d.income.yearMin, d.income.yearMax], [d.income.attrMin, d.income.mattrMax]
-			// current O(N): O(n * (n * 4)) => O(n2) amortized
-			input.forEach(function(d) {
-				d[attr].forEach(function(i) {
-					if (i[0] < keyMin || !(keyMin)) {
-						keyMin = i[0];
-					}
-					if (i[1] < valMin || !(valMin)) {
-						valMin = i[1];
-					}
-					if (i[0] > keyMax || !(keyMax)) {
-						keyMax = i[0];
-					}
-					if (i[1] > valMax || !(valMax)) {
-						valMax = i[1];
-					}
-				});
-			});
+		var setAxis = function(scale) {
 
-			return [keyMin, keyMax], [valMin, valMax];
-		};
+		}
+*/
 
-		var update = function(data, svg, scales, year) {
-			var newData = filterByYear(data, year);
-
-			var selection = svg.selectAll("circle")
-				.data(newData, function(d) { 
-					return d.country;
-				});
-
-			selection.enter()
-				.append("circle")
-				.merge(selection)
-				.transition()
-				.attr("cx", function(d) { 
-					if (d.income != null) {
-						return scales.xSca(d.income)
-				}})
-				.attr("cy", function(d) {
-					if (d.lifeExpectancy != null) {
-						return scales.ySca(d.lifeExpectancy)
-					}
-				})
-				.attr("r", function(d) {
-					if ((d.income && d.lifeExpectancy && d.population) != null) {
-						return scales.rSca(d.population) 
-					}
-				})
-				.attr("id", function(d) { return d.country })
-				.attr("fill", function(d) { return scales.cSca(d.region) })
-				.attr("class", "circle");
-
-			d3.select(".year").text(year);
-			
-			selection.exit().remove();
-		};
-		
 		d3.json("nations.json", function(error, data) {
 			if (error) return error;
 			console.log(data);		// original data
 
-			// data
-			// var year = 1950;
-			newData = filterByYear(data, year);
-			console.log(newData);	// filtered data
-
-			// vars -----------------------------------------------------------
-
-			var margin = { top: 20, right: 20, bottom: 20, left: 20 };
-			var width = 960 - margin.left - margin.right;
-			var height = 500 - margin.top - margin.bottom;
-
-			// min-max
-			var xExtent = getMinMax(data, "income");
-			var yExtent = getMinMax(data, "lifeExpectancy");
-			var rExtent = getMinMax(data, "population");
-			var colorDomain = d3.nest().key(function(d) { return d.region }).object(newData);
-			console.log("xExtent = ", xExtent, "yExtent = ", yExtent, "rExtent = ", rExtent);
-
-			// scales
-			var xScale = d3.scaleLog()
-				.domain([100, xExtent[1]])
-				.range([0, width + margin.left]);
-			var yScale = d3.scaleLinear()
-				.domain([0, (yExtent[1] + 5)])
-				.range([height, 0]);
-			var rScale = d3.scaleSqrt()
-				.domain(rExtent)
-				.range([0,90]);
-			var colorScale = d3.scaleOrdinal()
-				.domain(colorDomain)
-				.range(["Pink", "LightCyan", "Gainsboro", "Thistle", "MintCream", "LemonChiffon"]);
-
-			scales = {
-				xExt : xExtent,
-				yExt : yExtent,
-				rExt : rExtent,
-				color: colorDomain,
-				xSca : xScale,
-				ySca : yScale,
-				rSca : rScale,
-				cSca : colorScale
-			};
-
-			// axes
-			var x = d3.axisBottom()
-				.scale(xScale)
-				.ticks(10, ".0f");
-			var y = d3.axisLeft()
-				.scale(yScale);
-
-			// graph ----------------------------------------------------------
-
-			// svg
-			var svg = d3.select("body")
-				.append("svg")
-				.attr("width", width + margin.left + margin.right)
-				.attr("height", height + margin.top + margin.bottom)
-				.append("g")
-				.attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
-
-			// axes
-			var xAxis = svg.append("g")
-				.call(x)
-				.attr("transform", "translate(0, " + height + ")");
-			var yAxis = svg.append("g")
-				.call(y);
-
-			// labels
-			var xLabel = xAxis.append("text")
-				.text("income per capita, inflation adjusted (dollars)")
-				.attr("class", "axis")
-				.attr("transform", "translate(" + (width + margin.left) + ", " + 0.5 * -margin.bottom + ")")
-				.attr("text-anchor", "end");
-			var yLabel = yAxis.append("text")
-				.text("life expectancy (years)")
-				.attr("class", "axis")
-				.attr("transform", "translate(" + (margin.left * 0.85) + ", 0) rotate(-90)");
-			var yrLabel = svg.append("text")
-				.text(year)
-				.attr("class", "year")
-				.attr("transform", "translate(" + (width - 215) + ", " + (height - margin.bottom * 2.5) + ")")
-
-			// update(data, svg, scales, year);
-			window.svg = svg;
-			var interval = window.setInterval(function() {
-				if (year > 2009) {
-					year = 1950;
-				}
-				update(data, svg, scales, year);
-				year++;
-			}, 1000);
 		});
+
 	</script>
 </body>
 </html>

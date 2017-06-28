@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<head>
+	<title>Exoplanet Data Explorer</title>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<style>
+		.circle {
+			fill: SteelBlue;
+			fill-opacity: 0.5;
+		}
+		.circle:hover {
+			fill: #808080;
+			fill-opacity: 0.75;
+			stroke: White;
+		}
+		.exo-graph {
+			margin: 25px auto;
+			background-color: "";
+			display: block;
+		}
+		.title {
+			font-size: 20px;
+		}
+
+		div.tooltip {   
+			position: absolute;
+			text-align: center;
+			width: 160px; 
+			height: 48px;
+			padding: 2px;
+			font: 12px sans-serif;  
+			background: #f0f0f0;
+			border: 0px;
+			border-radius: 2px;
+			pointer-events: none;
+			color: #000;
+		}
+		.domain {
+			stroke: #c0c0c0;
+		}
+		.tick > line {
+			stroke: #c0c0c0;
+		}
+	</style>
+</head>
+<body>
+	<div class="container" style="width: 990px;">
+		<h1>Exoplanet Data Explorer</h1>
+		<div class="row">
+			<div class="col-md-6">
+				<p>X-Axis</p>
+				<select id="x-menu"></select>
+			</div>
+			<div class="col-md-6">
+				<p>Y-Axis</p>
+				<select id="y-menu"></select>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 graph">
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// populates dropdown menus with numeric values from numVals list
+		function populateSelect(selectionID, options, defaultVal) {
+			var select = document.getElementById(selectionID);
+			for(var i = 0; i < options.length; i++) {
+				var opt = options[i];
+				var ele = document.createElement("option");
+				ele.textContent = opt;
+				ele.value = opt;
+				if (options[i] == defaultVal) {
+					ele.selected = "selected";
+				}
+				select.appendChild(ele);
+			}
+		};
+
+		// parses CSV to convert number values from string to number format
+		function convertNumbers(row) {
+			var result = {};
+			for (var k in row) {
+				result[k] = +row[k];
+				if (isNaN(result[k])) {
+					result[k] = row[k];
+				}
+			}
+			return result;
+		}
+
+		// update selection
+		var updateSVG = function(svg, data, xVal, yVal, title, axisX, axisY) {
+			domain = setDomain(data, xVal, yVal);
+			range = setRange();
+			scale = setScale(domain, range);
+			axes = setAxes(scale);
+
+			var selection = svg.selectAll("circle")
+				.data(data, function(d) { return d["P. Name"] });
+
+			selection.exit().remove();
+
+			selection.enter()
+				.append("circle")
+				.merge(selection)
+				.transition()
+				.duration(1000)
+				.attr("cx", function(d) { return scale.x(d[xVal]) })
+				.attr("cy", function(d) { return scale.y(d[yVal]) })
+				.attr("r", 5)
+				.attr("id", function(d) { return d["P. Name"]} )
+				.attr("class", "circle");
+
+			title.text(xVal + " vs. " + yVal);
+			axisX.transition()
+				.duration(1000)
+				.call(axes.x);
+			axisY.transition()
+				.duration(1000)
+				.call(axes.y);
+
+			svg.selectAll("circle")
+				.on("mouseover", function(d) {
+					div.transition()
+						.duration(100)
+						.style("opacity", .9);
+					div.html(d["P. Name"] + "<br/>x: <strong>" + d[xVal] + "</strong><br/>y: <strong>" + d[yVal] + "</strong>")
+						.style("left", (d3.event.pageX + 3) + "px")
+						.style("top", (d3.event.pageY - 48) + "px")
+				})
+				.on("mouseout", function(d) {
+					div.transition()
+						.duration(100)
+						.style("opacity", 0);
+				})
+
+			return svg;
+		};
+
+		// setters ---------------------------------------------
+
+		var setDomain = function(data, xVal, yVal) {
+			return {
+				x: d3.extent(data, function(d) { return d[xVal] }),
+				y: d3.extent(data, function(d) { return d[yVal] })
+			}
+		}
+
+		var setRange = function() {
+			return {
+				x: [0, width],
+				y: [height, 0]
+			}
+		}
+
+		var setScale = function(domain, range) {
+			return {
+				x: d3.scaleLinear()
+					.domain(domain.x)
+					.range(range.x),
+				y: d3.scaleLinear()
+					.domain(domain.y)
+					.range(range.y)
+			}
+		}
+
+		var setAxes = function(scale) {
+			return {
+				x: d3.axisBottom().scale(scale.x),
+				y: d3.axisLeft().scale(scale.y)
+			}
+		}
+
+		// append axes, title, svg ---------------------------------
+
+		var appendX = function(svg, axes) {
+			var drawnX = svg.append("g")
+				.call(axes.x)
+				.attr("transform", "translate(0, " + height + ")");
+			return drawnX;
+		}
+
+		var appendY = function(svg, axes) {
+			drawnY = svg.append("g")
+				.call(axes.y);
+			return drawnY;
+		}
+
+		var appendTitle = function(svg, xVal, yVal) {
+			var title = svg.append("text")
+				.text(xVal + " vs. " + yVal)
+				.attr("class", "title")
+				.attr("transform", "translate(" + -margin.left + ", " + -(margin.top * 0.5) + ")")
+				.attr("text-anchor", "start");
+			return title;
+		}
+
+		var appendSVG = function() {
+			var svg = d3.select(".graph")
+				.append("svg")
+				.attr("class", "exo-graph")
+				.attr("width", width + margin.left + margin.right)
+				.attr("height", height + margin.top + margin.bottom)
+				.append("g")
+				.attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+			return svg;
+		}
+
+		// main ------------------------------------------------
+
+		// global variables
+		var margin = { top: 60, right: 50, bottom: 20, left: 50 };
+		var width = 960 - margin.left - margin.right;
+		var height = 500 - margin.top - margin.bottom;
+		
+		var url = "barleyfull.csv";
+		d3.csv(url, convertNumbers, callback);
+
+		// tooltip
+		var div = d3.select("body").append("div")
+			.attr("class", "tooltip")
+			.style("opacity", 0);
+
+		function callback(error, csv_data) {
+			if (error) throw error;
+
+			var data = csv_data;
+			console.log(data);
+
+			var xVal = d3.select("#x-menu")
+				.property("value");
+			var yVal = d3.select("#y-menu")
+				.property("value");
+
+			var domain = setDomain(data, xVal, yVal);
+			var range = setRange();
+			var scale = setScale(domain, range);
+			var axes = setAxes(scale);
+			var svg = appendSVG(svg);
+			var axisX = appendX(svg, axes);
+			var axisY = appendY(svg, axes);
+			var title = appendTitle(svg, xVal, yVal);
+
+			updateSVG(svg, data, xVal, yVal, title, axisX, axisY);
+
+			d3.select("#x-menu").on("change", function() {
+				xVal = d3.select("#x-menu")
+					.property("value");
+				updateSVG(svg, data, xVal, yVal, title, axisX, axisY);
+			});
+
+			d3.select("#y-menu").on("change", function() {
+				yVal = d3.select("#y-menu")
+					.property("value");
+				updateSVG(svg, data, xVal, yVal, title, axisX, axisY);
+			});
+		};
+	</script>
+</body>
+</html>

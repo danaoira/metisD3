@@ -38,10 +38,16 @@
 			stroke: #c0c0c0;
 		}
 
-		.year {
-			font-family: "Georgia";
-			font-size: 100px;
-			fill: #d0d0d0;
+		.line1 {
+			fill: none;
+			stroke: pink;
+			stroke-width: 3px;
+		}
+
+		.line2 {
+			fill: none;
+			stroke: darkseagreen;
+			stroke-width: 3px;
 		}
 	</style>
 </head>
@@ -242,18 +248,20 @@
 			console.log(newData);	// filtered data
 
 			// populate menus
-			populateMenus(minData, "#x-menu", "Chad");
-			populateMenus(minData, "#y-menu", "Gabon");
+			populateMenus(minData, "#x-menu", "United States");
+			populateMenus(minData, "#y-menu", "Canada");
 
 			// refactor to getNationData()
 			var nation1Data = d3.nest()
-				.key(function(d) { return d.name == "Chad" })
+				.key(function(d) { return d.name == "United States" })
 				.object(data);
 			var nation2Data = d3.nest()
-				.key(function(d) { return d.name == "Gabon" })
+				.key(function(d) { return d.name == "Canada" })
 				.object(data);
 			var nation1Series = nation1Data["true"][0].income;
 			var nation2Series = nation2Data["true"][0].income;
+			console.log("nation1Series", nation1Series);
+			console.log("nation2Series", nation2Series);
 
 			// vars -----------------------------------------------------------
 
@@ -266,12 +274,12 @@
 			var yExtent = getExtent(data, 1);
 			// var rExtent = getMinMax(data, "population");
 			var colorDomain = d3.nest().key(function(d) { return d.region }).object(minData);
-			console.log("colorDomain", colorDomain);
-			console.log("xExtent = ", xExtent, "yExtent = ", yExtent);
+			// console.log("colorDomain", colorDomain);
+			// console.log("xExtent = ", xExtent, "yExtent = ", yExtent);
 
 			// scales
 			var xScale = d3.scaleTime()
-				.domain(xExtent)
+				.domain([new Date(1800), new Date(2009)])
 				.range([0, width]);
 			var yScale = d3.scaleLinear()
 				.domain(yExtent)
@@ -282,17 +290,6 @@
 			var colorScale = d3.scaleOrdinal()
 				.domain(colorDomain)
 				.range(["Pink", "LightCyan", "Gainsboro", "Thistle", "MintCream", "LemonChiffon"]);
-
-			scales = {
-				xExt : xExtent,
-				yExt : yExtent,
-				// rExt : rExtent,
-				color: colorDomain,
-				xSca : xScale,
-				ySca : yScale,
-				// rSca : rScale,
-				cSca : colorScale
-			};
 
 			// axes
 			var x = d3.axisBottom()
@@ -324,27 +321,27 @@
 				.attr("class", "axis")
 				.attr("transform", "translate(15, 0) rotate(-90)")
 				.attr("text-anchor", "end");
-			// var yrLabel = svg.append("text")
-			// 	.text(year)
-			// 	.attr("class", "year")
-			// 	.attr("transform", "translate(" + (width - 215) + ", " + (height - margin.bottom * 2.5) + ")")
 
-			svg.append("g")
-				.attr("id", "x-data");
-			var xData = d3.select("#x-data")
-				.selectAll("path");
+			var gNation1 = svg.append("g")
+				.attr("id", "nation1");
+			var gNation2 = svg.append("g")
+				.attr("id", "nation2");
 
-			// update(newData, svg, scales);
+			var line = d3.line()
+				.x(function(d) { return xScale(d[0]) })
+				.y(function(d) { return yScale(d[1]) });
 
-			// update(data, svg, scales, year);
-			// window.svg = svg;
-			// var interval = window.setInterval(function() {
-			// 	if (year > 2009) {
-			// 		year = 1950;
-			// 	}
-			// 	update(data, svg, scales, year);
-			// 	year++;
-			// }, 250);
+			var path1 = svg
+				.append("path")
+				.attr("class", "line1")
+				.datum(nation1Series)
+				.attr("d", line);
+
+			var path2 = svg
+			.append("path")
+				.attr("class", "line2")
+				.datum(nation2Series)
+				.attr("d", line);
 		});
 	</script>
 </body>

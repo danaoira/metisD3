@@ -48,75 +48,94 @@
 <body>
 	<div class="container" style="width: 990px;">
 		<div class="row">
-			<div class="col-md-6 col-xs-6">
-				<p>X-Axis : Country 1</p>
+			<div class="col-md-4 col-xs-4">
+				<p>Country 1</p>
 				<select id="x-menu"></select>
 			</div>
-			<div class="col-md-6 col-xs-6">
-				<p>Y-Axis : Country 2</p>
+			<div class="col-md-4 col-xs-4">
+				<p>Country 2</p>
 				<select id="y-menu"></select>
+			</div>
+			<div class="col-md-4 col-xs-4">
+			<form id="series">
+				<input type="radio" id="income" name="series" value="income" checked /> Income<br/>
+				<input type="radio" id="lifeExpectancy" name="series" value="lifeExpectancy" /> Life Expectancy<br/>
+				<input type="radio" id="population" name="series" value="population" /> Population<br/>
+			</form>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-12 graph">
+			<div class="col-md-12 col-xs-12 graph">
 			</div>
 		</div>
 	</div>
 
 	<script>
 		var scales = {};
-		var year = 1950;
+		var series = ["income", "lifeExpectancy", "population"];
 
-		var populateMenus = function(data, menuID) {
+		var populateMenus = function(data, menuID, defaultVal) {
 			var dropdown = d3.select(menuID);
-			var regions = d3.nest().key(function(d) { return d.region }).entries(data);
-			console.log(regions);
-			dropdown.selectAll("optgroup")
-				.data(regions)
+			dropdown.selectAll("option")
+				.data(data)
 				.enter()
-				.append("optgroup")
-				.attr("value", function(d) { return d.key })
-				.text(function(d) { return d.key } );
-			// dropdown.selectAll("option")
-			// 	.data(data)
-			// 	.enter()
-			// 	.append("option")
-			// 	.attr("value", function(d) { return d.name })
-			// 	.text(function(d) { return d.name });
+				.append("option")
+				.attr("value", function(d) { return d.name })
+				.attr("selected", function(d) { 
+					if (d.name == defaultVal) { 
+						return "selected";
+					}
+				})
+				.text(function(d) { return d.name });
 		}
 
-		var filterByYear = function(input, year) {
+		var appendRadioButtons = function(input) {
+			var form = d3.select("#series");
+			form.selectAll("input")
+				.data(input)
+				.enter()
+				.append("input")
+				.attr("type", "radio")
+				.attr("id", function(d) { return d })
+				.attr("value", function(d) { return d }) 
+				.attr("name", "series")
+				.attr("checked", function(d, i) { 
+					if (i === 0) {
+						return "checked"
+					}
+				})
+				.text(function(d) { return d });
+		}
+
+		var processData = function(data, yrExtent) {
 			var result = [];
 
-			input.forEach(function(i) {
-				var nation = {
-					year: null,
-					name: null,
-					region: null,
-					income: null,
-					lifeExpectancy: null,
-					population: null
-				}
+			for (yr = yrExtent[0]; yr <= yrExtent[1]; yr++) {
+				var yrResult = [];
 
-				var getIncome = getAttrByYear(i, nation, year, "income");
-				var getLifeExpectancy = getAttrByYear(i, nation, year, "lifeExpectancy");
-				var getPopulation = getAttrByYear(i, name, nation, "population");
-				nation.name = i.name;
-				nation.region = i.region;
-				nation.year = year;
-				result.push(nation);
-			});
+				data.forEach(function(d) {
+					var nation = {
+						income: null,
+						lifeExpectancy: null,
+						name: null,
+						population: null,
+						region: null
+					}
+
+					var incomeData = getAttrByYear(d, nation, yr, "income");
+					var lifeExpData = getAttrByYear(d, nation, yr, "lifeExpectancy");
+					var populationData = getAttrByYear(d, nation, yr, "population");
+					nation.name = d.name;
+					nation.region = d.region;
+
+					yrResult.push(nation);
+				});
+
+				result[yr] = yrResult;
+			}
 
 			return result;
-		};
-
-		var getAttrByYear = function(input, output, year, attr) {
-			input[attr].forEach(function(d) { 
-				if (d[0] === year) { 
-					return output[attr] = d[1];
-				}
-			});
-		};
+		}
 
 		var getMinMax = function(input, attr) {
 			var min = 99999999;
@@ -134,12 +153,9 @@
 			});
 
 			return [min, max];
-		};
+		}
 
-		var update = function(data, svg, scales, year) {
-			var newData = filterByYear(data, year);
-			// console.log(newData);
-
+		var update = function(data, svg, nation1, nation2, series) {
 			var selection = svg.selectAll("circle")
 				.data(newData);
 
@@ -168,47 +184,101 @@
 			d3.select(".year").text(year);
 			
 			selection.exit().remove();
-		};
+		}
+
+		var getExtent = function(data, offset) {
+			var minYear;
+			var maxYear;
+
+			data.forEach(function(d) {
+				var inc = d.income.sort();
+				var incMin = inc.slice(0)[0][offset];
+				if (minYear > incMin | !(minYear)) {
+					minYear = incMin;
+				}
+				var incMax = inc.slice(-1)[0][offset];
+				if (maxYear < incMax | !(maxYear)) {
+					maxYear 
+				}
+				var life = d.lifeExpectancy.sort();
+				var lifeMin = inc.slice(0)[0][offset];
+				if (minYear > lifeMin | !(minYear)) {
+					minYear = lifeMin;
+				}
+				var lifeMax = inc.slice(-1)[0][offset];
+				if (maxYear < lifeMax | !(maxYear)) {
+					maxYear = lifeMax;
+				}
+				var pop = d.population.sort();
+				var popMin = inc.slice(0)[0][offset];
+				if (minYear > popMin | !(minYear)) {
+					minYear = popMin;
+				}
+				var popMax = inc.slice(-1)[0][offset];
+				if (maxYear < popMax | !(maxYear)) {
+					maxYear = popMax;
+				}
+			})
+			return [minYear, maxYear];
+		}
+
+		var getAttrByYear = function(input, output, year, attr) {
+			input[attr].forEach(function(d) { 
+				if (d[0] === year) { 
+					return output[attr] = d[1];
+				}
+			});
+		}
 		
 		d3.json("nations.json", function(error, data) {
 			if (error) return error;
 			console.log(data);		// original data
 
-			// data
-			// var year = 1950;
-			newData = filterByYear(data, year);
+			// input: old data => output: min/max years of all data
+			yrExtent = getExtent(data, 0);
+			newData = processData(data, yrExtent);
+			minData = newData[1800];
+
 			console.log(newData);	// filtered data
 
 			// populate menus
-			populateMenus(newData, "#x-menu");
-			populateMenus(newData, "#y-menu");
+			populateMenus(minData, "#x-menu", "Chad");
+			populateMenus(minData, "#y-menu", "Gabon");
 
-			// populateDropdowns(newData, "#x-axis");
-			// populateDropdowns(newData, "#y-axis");
+			// refactor to getNationData()
+			var nation1Data = d3.nest()
+				.key(function(d) { return d.name == "Chad" })
+				.object(data);
+			var nation2Data = d3.nest()
+				.key(function(d) { return d.name == "Gabon" })
+				.object(data);
+			var nation1Series = nation1Data["true"][0].income;
+			var nation2Series = nation2Data["true"][0].income;
 
 			// vars -----------------------------------------------------------
 
-			var margin = { top: 20, right: 20, bottom: 20, left: 20 };
+			var margin = { top: 20, right: 20, bottom: 20, left: 50 };
 			var width = 960 - margin.left - margin.right;
 			var height = 500 - margin.top - margin.bottom;
 
 			// min-max
-			var xExtent = getMinMax(data, "income");
-			var yExtent = getMinMax(data, "lifeExpectancy");
-			var rExtent = getMinMax(data, "population");
-			var colorDomain = d3.nest().key(function(d) { return d.region }).object(newData);
-			console.log("xExtent = ", xExtent, "yExtent = ", yExtent, "rExtent = ", rExtent);
+			var xExtent = yrExtent;
+			var yExtent = getExtent(data, 1);
+			// var rExtent = getMinMax(data, "population");
+			var colorDomain = d3.nest().key(function(d) { return d.region }).object(minData);
+			console.log("colorDomain", colorDomain);
+			console.log("xExtent = ", xExtent, "yExtent = ", yExtent);
 
 			// scales
-			var xScale = d3.scaleLog()
-				.domain([100, xExtent[1]])
-				.range([0, width + margin.left]);
+			var xScale = d3.scaleTime()
+				.domain(xExtent)
+				.range([0, width]);
 			var yScale = d3.scaleLinear()
-				.domain([0, (yExtent[1] + 5)])
+				.domain(yExtent)
 				.range([height, 0]);
-			var rScale = d3.scaleSqrt()
-				.domain(rExtent)
-				.range([0,90]);
+			// var rScale = d3.scaleSqrt()
+			// 	.domain(rExtent)
+			// 	.range([0,90]);
 			var colorScale = d3.scaleOrdinal()
 				.domain(colorDomain)
 				.range(["Pink", "LightCyan", "Gainsboro", "Thistle", "MintCream", "LemonChiffon"]);
@@ -216,25 +286,25 @@
 			scales = {
 				xExt : xExtent,
 				yExt : yExtent,
-				rExt : rExtent,
+				// rExt : rExtent,
 				color: colorDomain,
 				xSca : xScale,
 				ySca : yScale,
-				rSca : rScale,
+				// rSca : rScale,
 				cSca : colorScale
 			};
 
 			// axes
 			var x = d3.axisBottom()
 				.scale(xScale)
-				.ticks(10, ".0f");
+				.tickFormat(d3.timeFormat("%Y"));
 			var y = d3.axisLeft()
 				.scale(yScale);
 
 			// graph ----------------------------------------------------------
 
 			// svg
-			var svg = d3.select("body")
+			var svg = d3.select(".graph")
 				.append("svg")
 				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom)
@@ -249,19 +319,22 @@
 				.call(y);
 
 			// labels
-			var xLabel = xAxis.append("text")
-				.text("income per capita, inflation adjusted (dollars)")
-				.attr("class", "axis")
-				.attr("transform", "translate(" + (width + margin.left) + ", " + 0.5 * -margin.bottom + ")")
-				.attr("text-anchor", "end");
 			var yLabel = yAxis.append("text")
-				.text("life expectancy (years)")
+				.text("income (dollars)")
 				.attr("class", "axis")
-				.attr("transform", "translate(" + (margin.left * 0.85) + ", 0) rotate(-90)");
-			var yrLabel = svg.append("text")
-				.text(year)
-				.attr("class", "year")
-				.attr("transform", "translate(" + (width - 215) + ", " + (height - margin.bottom * 2.5) + ")")
+				.attr("transform", "translate(15, 0) rotate(-90)")
+				.attr("text-anchor", "end");
+			// var yrLabel = svg.append("text")
+			// 	.text(year)
+			// 	.attr("class", "year")
+			// 	.attr("transform", "translate(" + (width - 215) + ", " + (height - margin.bottom * 2.5) + ")")
+
+			svg.append("g")
+				.attr("id", "x-data");
+			var xData = d3.select("#x-data")
+				.selectAll("path");
+
+			// update(newData, svg, scales);
 
 			// update(data, svg, scales, year);
 			// window.svg = svg;

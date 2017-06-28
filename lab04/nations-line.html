@@ -46,38 +46,65 @@
 	</style>
 </head>
 <body>
-	<script>
-		/*	Input: nations.json
-			Output: 	x-axis = income
-						y-axis = lifeExpectancy
-						radius = population
-						color  = region
+	<div class="container" style="width: 990px;">
+		<div class="row">
+			<div class="col-md-6 col-xs-6">
+				<p>X-Axis : Country 1</p>
+				<select id="x-menu"></select>
+			</div>
+			<div class="col-md-6 col-xs-6">
+				<p>Y-Axis : Country 2</p>
+				<select id="y-menu"></select>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 graph">
+			</div>
+		</div>
+	</div>
 
-			Bonus: use the raw data from class 3 and create the final dataset yourself. Add axes and labels.
-			For extra practice: visualize the barley yield data. */
+	<script>
 		var scales = {};
 		var year = 1950;
+
+		var populateMenus = function(data, menuID) {
+			var dropdown = d3.select(menuID);
+			var regions = d3.nest().key(function(d) { return d.region }).entries(data);
+			console.log(regions);
+			dropdown.selectAll("optgroup")
+				.data(regions)
+				.enter()
+				.append("optgroup")
+				.attr("value", function(d) { return d.key })
+				.text(function(d) { return d.key } );
+			// dropdown.selectAll("option")
+			// 	.data(data)
+			// 	.enter()
+			// 	.append("option")
+			// 	.attr("value", function(d) { return d.name })
+			// 	.text(function(d) { return d.name });
+		}
 
 		var filterByYear = function(input, year) {
 			var result = [];
 
 			input.forEach(function(i) {
-				var country = {
+				var nation = {
 					year: null,
-					country: null,
+					name: null,
 					region: null,
 					income: null,
 					lifeExpectancy: null,
 					population: null
 				}
 
-				var getIncome = getAttrByYear(i, country, year, "income");
-				var getLifeExpectancy = getAttrByYear(i, country, year, "lifeExpectancy");
-				var getPopulation = getAttrByYear(i, country, year, "population");
-				country.country = i.name;
-				country.region = i.region;
-				country.year = year;
-				result.push(country);
+				var getIncome = getAttrByYear(i, nation, year, "income");
+				var getLifeExpectancy = getAttrByYear(i, nation, year, "lifeExpectancy");
+				var getPopulation = getAttrByYear(i, name, nation, "population");
+				nation.name = i.name;
+				nation.region = i.region;
+				nation.year = year;
+				result.push(nation);
 			});
 
 			return result;
@@ -111,6 +138,7 @@
 
 		var update = function(data, svg, scales, year) {
 			var newData = filterByYear(data, year);
+			// console.log(newData);
 
 			var selection = svg.selectAll("circle")
 				.data(newData);
@@ -133,7 +161,7 @@
 						return scales.rSca(d.population) 
 					}
 				})
-				.attr("id", function(d) { return d.country })
+				.attr("id", function(d) { return d.name })
 				.attr("fill", function(d) { return scales.cSca(d.region) })
 				.attr("class", "circle");
 
@@ -150,6 +178,13 @@
 			// var year = 1950;
 			newData = filterByYear(data, year);
 			console.log(newData);	// filtered data
+
+			// populate menus
+			populateMenus(newData, "#x-menu");
+			populateMenus(newData, "#y-menu");
+
+			// populateDropdowns(newData, "#x-axis");
+			// populateDropdowns(newData, "#y-axis");
 
 			// vars -----------------------------------------------------------
 
@@ -229,14 +264,14 @@
 				.attr("transform", "translate(" + (width - 215) + ", " + (height - margin.bottom * 2.5) + ")")
 
 			// update(data, svg, scales, year);
-			window.svg = svg;
-			var interval = window.setInterval(function() {
-				if (year > 2009) {
-					year = 1950;
-				}
-				update(data, svg, scales, year);
-				year++;
-			}, 250);
+			// window.svg = svg;
+			// var interval = window.setInterval(function() {
+			// 	if (year > 2009) {
+			// 		year = 1950;
+			// 	}
+			// 	update(data, svg, scales, year);
+			// 	year++;
+			// }, 250);
 		});
 	</script>
 </body>

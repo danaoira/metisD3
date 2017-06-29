@@ -62,11 +62,11 @@
 <body>
 	<div class="container" style="width: 990px;">
 		<div class="row">
-			<div class="col-md-4 col-xs-4">
+			<div class="col-md-4 col-xs-4 country1">
 				<p>Country 1</p>
 				<select id="x-menu"></select>
 			</div>
-			<div class="col-md-4 col-xs-4">
+			<div class="col-md-4 col-xs-4 country2">
 				<p>Country 2</p>
 				<select id="y-menu"></select>
 			</div>
@@ -85,6 +85,9 @@
 	</div>
 
 	<script>
+		var margin = { top: 20, right: 20, bottom: 20, left: 50 };
+		var width = 960 - margin.left - margin.right;
+		var height = 450 - margin.top - margin.bottom;
 		var scales = {};
 		var series = ["income", "lifeExpectancy", "population"];
 
@@ -101,24 +104,6 @@
 					}
 				})
 				.text(function(d) { return d.name });
-		}
-
-		var appendRadioButtons = function(input) {
-			var form = d3.select("#series");
-			form.selectAll("input")
-				.data(input)
-				.enter()
-				.append("input")
-				.attr("type", "radio")
-				.attr("id", function(d) { return d })
-				.attr("value", function(d) { return d }) 
-				.attr("name", "series")
-				.attr("checked", function(d, i) { 
-					if (i === 0) {
-						return "checked"
-					}
-				})
-				.text(function(d) { return d });
 		}
 
 		var processData = function(data, yrExtent) {
@@ -169,6 +154,62 @@
 			return [min, max];
 		}
 
+		var getExtent = function(data, attr) {
+			var min;
+			var max;
+
+			data.forEach(function(d) {
+				if (attr != undefined) {
+					var att = d[attr].sort();
+					var attMin = att.slice(0)[0][1];
+					if (min > attMin | !(min)) {
+						min = attMin;
+					}
+					var attMax = d[attr].slice(-1)[0][1];
+					if (max < attMax | !(max)) {
+						max = attMax;
+					}
+				} else {
+					var inc = d.income.sort();
+					var incMin = inc.slice(0)[0][0];
+					if (min > incMin | !(min)) {
+						min = incMin;
+					}
+					var incMax = inc.slice(-1)[0][0];
+					if (max < incMax | !(max)) {
+						max 
+					}
+					var life = d.lifeExpectancy.sort();
+					var lifeMin = inc.slice(0)[0][0];
+					if (min > lifeMin | !(min)) {
+						min = lifeMin;
+					}
+					var lifeMax = inc.slice(-1)[0][0];
+					if (max < lifeMax | !(max)) {
+						max = lifeMax;
+					}
+					var pop = d.population.sort();
+					var popMin = inc.slice(0)[0][0];
+					if (min > popMin | !(min)) {
+						min = popMin;
+					}
+					var popMax = inc.slice(-1)[0][0];
+					if (max < popMax | !(max)) {
+						max = popMax;
+					}
+				}
+			})
+			return [min, max];
+		}
+
+		var getAttrByYear = function(input, output, year, attr) {
+			input[attr].forEach(function(d) { 
+				if (d[0] === year) { 
+					return output[attr] = d[1];
+				}
+			});
+		}
+
 		var update = function(data, svg, nation1, nation2, series) {
 			var selection = svg.selectAll("circle")
 				.data(newData);
@@ -200,56 +241,14 @@
 			selection.exit().remove();
 		}
 
-		var getExtent = function(data, offset) {
-			var minYear;
-			var maxYear;
-
-			data.forEach(function(d) {
-				var inc = d.income.sort();
-				var incMin = inc.slice(0)[0][offset];
-				if (minYear > incMin | !(minYear)) {
-					minYear = incMin;
-				}
-				var incMax = inc.slice(-1)[0][offset];
-				if (maxYear < incMax | !(maxYear)) {
-					maxYear 
-				}
-				var life = d.lifeExpectancy.sort();
-				var lifeMin = inc.slice(0)[0][offset];
-				if (minYear > lifeMin | !(minYear)) {
-					minYear = lifeMin;
-				}
-				var lifeMax = inc.slice(-1)[0][offset];
-				if (maxYear < lifeMax | !(maxYear)) {
-					maxYear = lifeMax;
-				}
-				var pop = d.population.sort();
-				var popMin = inc.slice(0)[0][offset];
-				if (minYear > popMin | !(minYear)) {
-					minYear = popMin;
-				}
-				var popMax = inc.slice(-1)[0][offset];
-				if (maxYear < popMax | !(maxYear)) {
-					maxYear = popMax;
-				}
-			})
-			return [minYear, maxYear];
-		}
-
-		var getAttrByYear = function(input, output, year, attr) {
-			input[attr].forEach(function(d) { 
-				if (d[0] === year) { 
-					return output[attr] = d[1];
-				}
-			});
-		}
+		// main ================================================
 		
 		d3.json("nations.json", function(error, data) {
 			if (error) return error;
 			console.log(data);		// original data
 
 			// input: old data => output: min/max years of all data
-			yrExtent = getExtent(data, 0);
+			yrExtent = getExtent(data);
 			newData = processData(data, yrExtent);
 			minData = newData[1800];
 
@@ -259,31 +258,31 @@
 			populateMenus(minData, "#x-menu", "United States");
 			populateMenus(minData, "#y-menu", "Canada");
 
+			// get values
+			var nation1 = d3.select("#x-menu")
+				.property("value");
+			var nation2 = d3.select("#y-menu")
+				.property("value");
+			var seriesVal = d3.selectAll("#series input")
+				.property("value");
+
 			// refactor to getNationData()
 			var nation1Data = d3.nest()
-				.key(function(d) { return d.name == "United States" })
+				.key(function(d) { return d.name == nation1 })
 				.object(data);
 			var nation2Data = d3.nest()
-				.key(function(d) { return d.name == "Canada" })
+				.key(function(d) { return d.name == nation2 })
 				.object(data);
 			var nation1Series = nation1Data["true"][0].income;
 			var nation2Series = nation2Data["true"][0].income;
-			console.log("nation1Series", nation1Series);
-			console.log("nation2Series", nation2Series);
 
-			// vars -----------------------------------------------------------
-
-			var margin = { top: 20, right: 20, bottom: 20, left: 50 };
-			var width = 960 - margin.left - margin.right;
-			var height = 450 - margin.top - margin.bottom;
+			// vars --------------------------------------------
 
 			// min-max
 			var xExtent = yrExtent;
-			var yExtent = getExtent(data, 1);
-			// var rExtent = getMinMax(data, "population");
+			var yExtent = getExtent(data, "income");
+			console.log(yExtent);
 			var colorDomain = d3.nest().key(function(d) { return d.region }).object(minData);
-			// console.log("colorDomain", colorDomain);
-			// console.log("xExtent = ", xExtent, "yExtent = ", yExtent);
 
 			// scales
 			var xScale = d3.scaleTime()
@@ -292,9 +291,6 @@
 			var yScale = d3.scaleLinear()
 				.domain(yExtent)
 				.range([height, 0]);
-			// var rScale = d3.scaleSqrt()
-			// 	.domain(rExtent)
-			// 	.range([0,90]);
 			var colorScale = d3.scaleOrdinal()
 				.domain(colorDomain)
 				.range(["Pink", "LightCyan", "Gainsboro", "Thistle", "MintCream", "LemonChiffon"]);
@@ -323,6 +319,10 @@
 			var yAxis = svg.append("g")
 				.call(y);
 
+			var line = d3.line()
+				.x(function(d) { return xScale(d[0]) })
+				.y(function(d) { return yScale(d[1]) });
+
 			// labels
 			var yLabel = yAxis.append("text")
 				.text("income (dollars)")
@@ -335,21 +335,33 @@
 			var gNation2 = svg.append("g")
 				.attr("id", "nation2");
 
-			var line = d3.line()
-				.x(function(d) { return xScale(d[0]) })
-				.y(function(d) { return yScale(d[1]) });
-
-			var path1 = svg
-				.append("path")
+			var path1 = gNation1.append("path")
 				.attr("class", "line1")
 				.datum(nation1Series)
 				.attr("d", line);
 
-			var path2 = svg
-			.append("path")
+			var path2 = gNation2.append("path")
 				.attr("class", "line2")
 				.datum(nation2Series)
 				.attr("d", line);
+
+			d3.select("#x-menu").on("change", function(d) {
+				nation1 = d3.select("#x-menu")
+					.property("value")
+				console.log(nation1);
+			})
+
+			d3.select("#y-menu").on("change", function(d) {
+				nation2 = d3.select("#y-menu")
+					.property("value");
+				console.log(nation2);
+			})
+
+			d3.select("#series").on("change", function(d) {
+				seriesVal = d3.select("#series input")
+					.property("value");
+				console.log(seriesVal);
+			})
 		});
 	</script>
 </body>

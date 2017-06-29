@@ -72,7 +72,7 @@
 			</div>
 			<div class="col-md-4 col-xs-4">
 			<form id="series">
-				<label><input type="radio" id="income" name="series" value="income" checked /> Income</label><br/>
+				<input type="radio" id="income" name="series" value="income" checked /> Income<br/>
 				<input type="radio" id="lifeExpectancy" name="series" value="lifeExpectancy" /> Life Expectancy<br/>
 				<input type="radio" id="population" name="series" value="population" /> Population<br/>
 			</form>
@@ -358,7 +358,7 @@
 			})
 
 			d3.select("#series").on("change", function(d) {
-				seriesVal = d3.select("#series input")
+				seriesVal = d3.select("#series input:checked")
 					.property("value");
 				console.log(seriesVal);
 			})

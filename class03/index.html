@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Skeleton file to explore data in Class 3">
+
+  <title>Data Reading &amp; Shaping</title>
+  <style>
+  </style>
+</head>
+<body>
+  <svg></svg>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script>
+    var countries = "data/countries.json";
+    var literacy = "data/literacy.xml";
+    var nations = "data/nations.json";
+    var poverty = "data/poverty.csv";
+
+    // d3.json(countries, validateJson);
+    // d3.xml(literacy, validateXml);
+    // d3.json(nations, validateJson);
+    // d3.csv(poverty, row, validateCsv);
+
+    // function validateJson(error, json_data) {
+    //   if (error) throw error;
+    //   console.log(json_data);
+    // }
+
+    // function validateXml(error, xml_data) {
+    //   if (error) throw error;
+    //   console.log(xml_data);
+    // }
+
+    // function validateCsv(error, csv_data) {
+    //   if (error) throw error;
+    //   console.log(csv_data);
+    // } 
+
+    // function row(d) {
+    //   d["2000"] = +d["2000"];
+    //   return d;
+    // }
+
+    d3.queue()
+      .defer(d3.json, countries)
+      .defer(d3.xml, literacy)
+      .defer(d3.json, nations)
+      .defer(d3.csv, poverty)
+      .await(callback);
+
+    function callback(error, countries, literacy, nations, poverty) {
+      if (error) throw error;
+      console.log(countries, literacy, nations, poverty);
+    }
+
+  </script>
+</body>

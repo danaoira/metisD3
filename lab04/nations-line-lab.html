@@ -191,16 +191,12 @@
 			});
 		}
 
-		var update = function() {
-			var path1 = gNation1.append("path")
-				.attr("class", "line1")
-				.datum(nation1Series)
-				.attr("d", line);
-
+		var update = function(data, svg, nation1, nation2, series) {
 			var selection = svg.selectAll("circle")
 				.data(newData);
 
 			selection.enter()
+				.append("circle")
 				.merge(selection)
 				.transition()
 				.attr("cx", function(d) { 
@@ -252,12 +248,23 @@
 				.property("value");
 
 			// refactor to getNationData()
+			var nation1Data = d3.nest()
+				.key(function(d) { return d.name == nation1 })
+				.object(data);
+			var nation2Data = d3.nest()
+				.key(function(d) { return d.name == nation2 })
+				.object(data);
+			var nation1Series = nation1Data["true"][0].lifeExpectancy;
+			var nation2Series = nation2Data["true"][0].lifeExpectancy;
 
 			// vars --------------------------------------------
 
 			// min-max
-			var xExtent = yrExtent;
-			var yExtent = getExtent(data, "income");
+			var country = data[0];
+			var xExtent = d3.extent(country.lifeExpectancy, function(d) { return d[0]; });
+			var yExtent = d3.extent(country.lifeExpectancy, function(d) { return d[1]; });
+			// var xExtent = yrExtent;
+			// var yExtent = getExtent(data, "income");
 			console.log(yExtent);
 			var colorDomain = d3.nest().key(function(d) { return d.region }).object(minData);
 
@@ -266,7 +273,7 @@
 				.domain([1800, 2009])
 				.range([0, width]);
 			var yScale = d3.scaleLinear()
-				.domain(yExtent)
+				.domain([0, yExtent[1]])
 				.range([height, 0]);
 			var colorScale = d3.scaleOrdinal()
 				.domain(colorDomain)
@@ -296,6 +303,10 @@
 			var yAxis = svg.append("g")
 				.call(y);
 
+			var line = d3.line()
+				.x(function(d) { return xScale(d[0]) })
+				.y(function(d) { return yScale(d[1]) });
+
 			// labels
 			var yLabel = yAxis.append("text")
 				.text("income (dollars)")
@@ -304,45 +315,30 @@
 				.attr("text-anchor", "end");
 
 			var gNation1 = svg.append("g")
-				.attr("id", "nation1")
-				.append("path")
-				.attr("class", "line1");
+				.attr("id", "nation1");
 			var gNation2 = svg.append("g")
-				.attr("id", "nation2").append("path")
-				.attr("class", "line2");
+				.attr("id", "nation2");
 
-			var line = d3.line()
-				.x(function(d) { return xScale(d[0]) })
-				.y(function(d) { return yScale(d[1]) });
+			var path1 = gNation1.append("path")
+				.attr("class", "line1")
+				.datum(nation1Series)
+				.attr("d", line);
+
+			var path2 = gNation2.append("path")
+				.attr("class", "line2")
+				.datum(nation2Series)
+				.attr("d", line);
 
 			d3.select("#x-menu").on("change", function(d) {
 				nation1 = d3.select("#x-menu")
-					.property("value");
-				console.log("blah", data.filter(function(d) { return d.name == nation1; } ));
-				var nation1Data = d3.nest()
-					.key(function(d) { return d.name == nation1 })
-					.object(data);
-				var nation1Series = nation1Data["true"][0].income;
-				// console.log(nation1);
-				
-				gNation1.datum(nation1Series)
-					.attr("d", line);
-
-				// console.log(data, nation1Data, nation1Series);
+					.property("value")
+				console.log(nation1);
 			})
 
 			d3.select("#y-menu").on("change", function(d) {
 				nation2 = d3.select("#y-menu")
 					.property("value");
-
-				var nation2Data = d3.nest()
-					.key(function(d) { return d.name == nation2 })
-					.object(data);
-				var nation2Series = nation2Data["true"][0].income;
 				console.log(nation2);
-
-				gNation2.datum(nation2Series)
-					.attr("d", line);
 			})
 
 			d3.select("#series").on("change", function(d) {

@@ -191,39 +191,64 @@
 			});
 		}
 
-		var update = function() {
-			var path1 = gNation1.append("path")
-				.attr("class", "line1")
-				.datum(nation1Series)
-				.attr("d", line);
+		var update = function(data, svg, datum, nation, xScale, yScale) {
+			var line = d3.line()
+				.x(function(d) { return xScale(d[0]) })
+				.y(function(d) { return yScale(d[1]) });
 
-			var selection = svg.selectAll("circle")
-				.data(newData);
+			var selection = svg.select("#" + nation)
+				.selectAll("path")
+				.datum(datum);
 
 			selection.enter()
+				.append("path")
 				.merge(selection)
-				.transition()
-				.attr("cx", function(d) { 
-					if (d.income != null) {
-						return scales.xSca(d.income)
-				}})
-				.attr("cy", function(d) {
-					if (d.lifeExpectancy != null) {
-						return scales.ySca(d.lifeExpectancy)
-					}
-				})
-				.attr("r", function(d) {
-					if ((d.income && d.lifeExpectancy && d.population) != null) {
-						return scales.rSca(d.population) 
-					}
-				})
-				.attr("id", function(d) { return d.name })
-				.attr("fill", function(d) { return scales.cSca(d.region) })
-				.attr("class", "circle");
+				.attr("d", line);
 
-			d3.select(".year").text(year);
+			// var path1 = gNation1.append("path")
+			// 	.attr("class", "line1")
+			// 	.datum(nation1Series)
+			// 	.attr("d", line);
+
+			// var path2 = gNation2.append("path")
+			// 	.attr("class", "line2")
+			// 	.datum(nation2Series)
+			// 	.attr("d", line);
+
+			// var selection = svg.selectAll("circle")
+			// 	.data(newData);
+
+			// selection.enter()
+			// 	.append("circle")
+			// 	.merge(selection)
+			// 	.transition()
+			// 	.attr("cx", function(d) { 
+			// 		if (d.income != null) {
+			// 			return scales.xSca(d.income)
+			// 	}})
+			// 	.attr("cy", function(d) {
+			// 		if (d.lifeExpectancy != null) {
+			// 			return scales.ySca(d.lifeExpectancy)
+			// 		}
+			// 	})
+			// 	.attr("r", function(d) {
+			// 		if ((d.income && d.lifeExpectancy && d.population) != null) {
+			// 			return scales.rSca(d.population) 
+			// 		}
+			// 	})
+			// 	.attr("id", function(d) { return d.name })
+			// 	.attr("fill", function(d) { return scales.cSca(d.region) })
+			// 	.attr("class", "circle");
+
+			// d3.select(".year").text(year);
 			
 			selection.exit().remove();
+		}
+
+		var drawLine = function(svg, scale, lineData) {
+			var line = d3.line()
+				.x(function(d) { return xScale(d[0]) })
+				.y(function(d) { return yScale(d[1]) });
 		}
 
 		// main ================================================
@@ -252,6 +277,14 @@
 				.property("value");
 
 			// refactor to getNationData()
+			var nation1Data = d3.nest()
+				.key(function(d) { return d.name == nation1 })
+				.object(data);
+			var nation2Data = d3.nest()
+				.key(function(d) { return d.name == nation2 })
+				.object(data);
+			var nation1Series = nation1Data["true"][0].income;
+			var nation2Series = nation2Data["true"][0].income;
 
 			// vars --------------------------------------------
 
@@ -304,45 +337,23 @@
 				.attr("text-anchor", "end");
 
 			var gNation1 = svg.append("g")
-				.attr("id", "nation1")
-				.append("path")
-				.attr("class", "line1");
+				.attr("id", "nation1");
 			var gNation2 = svg.append("g")
-				.attr("id", "nation2").append("path")
-				.attr("class", "line2");
+				.attr("id", "nation2");
 
-			var line = d3.line()
-				.x(function(d) { return xScale(d[0]) })
-				.y(function(d) { return yScale(d[1]) });
+			update(data, svg, nation1Series, nation1);
+			update(data, svg, nation2Series, nation2);
 
 			d3.select("#x-menu").on("change", function(d) {
 				nation1 = d3.select("#x-menu")
-					.property("value");
-				console.log("blah", data.filter(function(d) { return d.name == nation1; } ));
-				var nation1Data = d3.nest()
-					.key(function(d) { return d.name == nation1 })
-					.object(data);
-				var nation1Series = nation1Data["true"][0].income;
-				// console.log(nation1);
-				
-				gNation1.datum(nation1Series)
-					.attr("d", line);
-
-				// console.log(data, nation1Data, nation1Series);
+					.property("value")
+				console.log(nation1);
 			})
 
 			d3.select("#y-menu").on("change", function(d) {
 				nation2 = d3.select("#y-menu")
 					.property("value");
-
-				var nation2Data = d3.nest()
-					.key(function(d) { return d.name == nation2 })
-					.object(data);
-				var nation2Series = nation2Data["true"][0].income;
 				console.log(nation2);
-
-				gNation2.datum(nation2Series)
-					.attr("d", line);
 			})
 
 			d3.select("#series").on("change", function(d) {

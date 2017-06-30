@@ -79,7 +79,8 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-12 col-xs-12 graph"></div>
+			<div class="col-md-12 col-xs-12 graph">
+			</div>
 		</div>
 	</div>
 
@@ -96,44 +97,44 @@
 				.data(data)
 				.enter()
 				.append("option")
-				.attr("value", function(d) { return d.name })
+				.attr("value", function(d) { return d })
 				.attr("selected", function(d) { 
-					if (d.name == defaultVal) { 
+					if (d == defaultVal) { 
 						return "selected";
 					}
 				})
-				.text(function(d) { return d.name });
+				.text(function(d) { return d });
 		}
 
-		var processData = function(data, yrExtent) {
-			var result = [];
+		// var processData = function(data, yrExtent) {
+		// 	var result = [];
 
-			for (yr = yrExtent[0]; yr <= yrExtent[1]; yr++) {
-				var yrResult = [];
+		// 	for (yr = yrExtent[0]; yr <= yrExtent[1]; yr++) {
+		// 		var yrResult = [];
 
-				data.forEach(function(d) {
-					var nation = {
-						income: null,
-						lifeExpectancy: null,
-						name: null,
-						population: null,
-						region: null
-					}
+		// 		data.forEach(function(d) {
+		// 			var nation = {
+		// 				income: null,
+		// 				lifeExpectancy: null,
+		// 				name: null,
+		// 				population: null,
+		// 				region: null
+		// 			}
 
-					var incomeData = getAttrByYear(d, nation, yr, "income");
-					var lifeExpData = getAttrByYear(d, nation, yr, "lifeExpectancy");
-					var populationData = getAttrByYear(d, nation, yr, "population");
-					nation.name = d.name;
-					nation.region = d.region;
+		// 			var incomeData = getAttrByYear(d, nation, yr, "income");
+		// 			var lifeExpData = getAttrByYear(d, nation, yr, "lifeExpectancy");
+		// 			var populationData = getAttrByYear(d, nation, yr, "population");
+		// 			nation.name = d.name;
+		// 			nation.region = d.region;
 
-					yrResult.push(nation);
-				});
+		// 			yrResult.push(nation);
+		// 		});
 
-				result[yr] = yrResult;
-			}
+		// 		result[yr] = yrResult;
+		// 	}
 
-			return result;
-		}
+		// 	return result;
+		// }
 
 		var getExtent = function(data, attr) {
 			var min;
@@ -183,24 +184,20 @@
 			return [min, max];
 		}
 
-		var getAttrByYear = function(input, output, year, attr) {
-			input[attr].forEach(function(d) { 
-				if (d[0] === year) { 
-					return output[attr] = d[1];
-				}
-			});
-		}
+		// var getAttrByYear = function(input, output, year, attr) {
+		// 	input[attr].forEach(function(d) { 
+		// 		if (d[0] === year) { 
+		// 			return output[attr] = d[1];
+		// 		}
+		// 	});
+		// }
 
-		var update = function() {
-			var path1 = gNation1.append("path")
-				.attr("class", "line1")
-				.datum(nation1Series)
-				.attr("d", line);
-
+		var update = function(data, svg, nation1, nation2, series) {
 			var selection = svg.selectAll("circle")
 				.data(newData);
 
 			selection.enter()
+				.append("circle")
 				.merge(selection)
 				.transition()
 				.attr("cx", function(d) { 
@@ -232,16 +229,15 @@
 			if (error) return error;
 			console.log(data);		// original data
 
-			// input: old data => output: min/max years of all data
-			yrExtent = getExtent(data);
-			newData = processData(data, yrExtent);
-			minData = newData[1800];
+			// minData = newData[1800];
+			var yrExtent = d3.extent(data, function(d) { return d.income[] })
+			var countries = data.map(function(d) { return d.name });
 
-			console.log(newData);	// filtered data
+			console.log(countries);	// filtered data
 
 			// populate menus
-			populateMenus(minData, "#x-menu", "United States");
-			populateMenus(minData, "#y-menu", "Canada");
+			populateMenus(countries, "#x-menu", "United States");
+			populateMenus(countries, "#y-menu", "Canada");
 
 			// get values
 			var nation1 = d3.select("#x-menu")
@@ -252,18 +248,28 @@
 				.property("value");
 
 			// refactor to getNationData()
+			var nation1Data = d3.nest()
+				.key(function(d) { return d.name == nation1 })
+				.object(data);
+			console.log(nation1Data)
+			var nation2Data = d3.nest()
+				.key(function(d) { return d.name == nation2 })
+				.object(data);
+			var nation1Series = nation1Data["true"][0].income;
+			var nation2Series = nation2Data["true"][0].income;
 
 			// vars --------------------------------------------
 
 			// min-max
 			var xExtent = yrExtent;
-			var yExtent = getExtent(data, "income");
+			var yExtent = d3.extent(data, function(d) { return d.lifeExpectancy[0][1] });
+			// var yExtent = getExtent(data, "income");
 			console.log(yExtent);
 			var colorDomain = d3.nest().key(function(d) { return d.region }).object(minData);
 
 			// scales
-			var xScale = d3.scaleLinear()
-				.domain([1800, 2009])
+			var xScale = d3.scaleTime()
+				.domain([new Date(1800), new Date(2009)])
 				.range([0, width]);
 			var yScale = d3.scaleLinear()
 				.domain(yExtent)
@@ -275,7 +281,7 @@
 			// axes
 			var x = d3.axisBottom()
 				.scale(xScale)
-				.tickFormat(d3.format("d"));
+				.tickFormat(d3.timeFormat("%Y"));
 			var y = d3.axisLeft()
 				.scale(yScale);
 
@@ -296,6 +302,10 @@
 			var yAxis = svg.append("g")
 				.call(y);
 
+			var line = d3.line()
+				.x(function(d) { return xScale(d[0]) })
+				.y(function(d) { return yScale(d[1]) });
+
 			// labels
 			var yLabel = yAxis.append("text")
 				.text("income (dollars)")
@@ -304,45 +314,30 @@
 				.attr("text-anchor", "end");
 
 			var gNation1 = svg.append("g")
-				.attr("id", "nation1")
-				.append("path")
-				.attr("class", "line1");
+				.attr("id", "nation1");
 			var gNation2 = svg.append("g")
-				.attr("id", "nation2").append("path")
-				.attr("class", "line2");
+				.attr("id", "nation2");
 
-			var line = d3.line()
-				.x(function(d) { return xScale(d[0]) })
-				.y(function(d) { return yScale(d[1]) });
+			var path1 = gNation1.append("path")
+				.attr("class", "line1")
+				.datum(nation1Series)
+				.attr("d", line);
+
+			var path2 = gNation2.append("path")
+				.attr("class", "line2")
+				.datum(nation2Series)
+				.attr("d", line);
 
 			d3.select("#x-menu").on("change", function(d) {
 				nation1 = d3.select("#x-menu")
-					.property("value");
-				console.log("blah", data.filter(function(d) { return d.name == nation1; } ));
-				var nation1Data = d3.nest()
-					.key(function(d) { return d.name == nation1 })
-					.object(data);
-				var nation1Series = nation1Data["true"][0].income;
-				// console.log(nation1);
-				
-				gNation1.datum(nation1Series)
-					.attr("d", line);
-
-				// console.log(data, nation1Data, nation1Series);
+					.property("value")
+				console.log(nation1);
 			})
 
 			d3.select("#y-menu").on("change", function(d) {
 				nation2 = d3.select("#y-menu")
 					.property("value");
-
-				var nation2Data = d3.nest()
-					.key(function(d) { return d.name == nation2 })
-					.object(data);
-				var nation2Series = nation2Data["true"][0].income;
 				console.log(nation2);
-
-				gNation2.datum(nation2Series)
-					.attr("d", line);
 			})
 
 			d3.select("#series").on("change", function(d) {

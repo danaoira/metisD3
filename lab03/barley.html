@@ -29,6 +29,14 @@
 </head>
 <body>
 	<script>
+		// global vars -----------------------------------------
+
+		var margin = { top: 20, right: 20, bottom: 20, left: 20 };
+		var width = 960 - margin.left - margin.right;
+		var height = 500 - margin.top - margin.bottom;
+
+		// functions ===========================================
+
 		var convertCSV = function(row) {
 			var result = {};
 			for (var i in row) {
@@ -40,19 +48,38 @@
 			return result;
 		}
 
-		var main = function(error, data) {
-			if (error) throw error;
-			console.log(data);
+		// setters ---------------------------------------------
+
+		function setRange() {
+			return {
+				x: [0, width],
+				y: [height, 0]
+			}
 		}
 
-		// -----------------------------------------------------
 
-		var margin = { top: 20, right: 20, bottom: 20, left: 20 };
-		var width = 960 - margin.left - margin.right;
-		var height = 500 - margin.top - margin.bottom;
+		// main ================================================
+
+		function main(error, data) {
+			if (error) throw error;
+			console.log(data);
+
+			var newData = d3.nest()
+				.key(function(d) { return d.gen })
+				.key(function(d) { return d.site })
+				.rollup(function(leaves) { 
+					return { "total yield": d3.sum(leaves, function(d) { 
+						return parseInt(d.yield); 
+					})}
+				}).entries(data);
+
+			console.log(newData);
+		}
 		
 		var url = "barleyfull.csv";
 		d3.csv(url, convertCSV, main);
+
+
 	</script>
 </body>
 </html>

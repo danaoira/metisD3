@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <head>
-	<title>Exoplanet Data Explorer</title>
 	<script src="https://d3js.org/d3.v4.min.js"></script>
 	<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -48,12 +47,14 @@
 	<div class="container" style="width: 990px;">
 		<div id="menu" class="row">
 			<div class="col-md-4 col-xs-4">
-				<p>Nation 1</p>
-				<select id="menu-1"></select>
+				<select id="menu-1" aria-label="Test">
+					<option value="null" selected>Nation 1</option>
+				</select>
 			</div>
 			<div class="col-md-4 col-xs-4">
-				<p>Nation 2</p>
-				<select id="menu-2"></select>
+				<select id="menu-2">
+					<option value="null" selected>Nation 2</option>
+				</select>
 			</div>
 			<div class="col-md-4 col-xs-4">
 			<form id="series">
@@ -78,18 +79,13 @@
 		// =====================================================
 
 		// populates dropdown menus with numeric values from numVals list
-		function setMenu(data, menuID, defaultVal) {
+		function setMenu(data, menuID) {
 			var dropdown = d3.select(menuID);
 			dropdown.selectAll("option")
 				.data(data)
 				.enter()
 				.append("option")
 				.attr("value", function(d) { return d; })
-				.attr("selected", function(d) { 
-					if (d == defaultVal) { 
-						return "selected";
-					}
-				})
 				.text(function(d) { return d; });
 		}
 
@@ -177,44 +173,62 @@
 			return svg;
 		}
 
-		// unorganized -----------------------------------------
+		// update ----------------------------------------------
 
 		function update(data) {
 			var nation1 = d3.select("#menu-1").property("value");
 			var nation2 = d3.select("#menu-2").property("value");
 			var series = d3.selectAll(".series:checked").property("value");
-			var nation1data = getNationData(data, nation1, series);
-			var nation2data = getNationData(data, nation2, series);
-			console.log(nation1, nation2, series, nation1data, nation2data);
+			var nation1data = (nation1 != "null") ? getNationData(data, nation1, series) : null;
+			console.log("nation1data = ", nation1data);
+			var nation2data = (nation2 != "null") ? getNationData(data, nation2, series) : null;
+			console.log("nation2data = ", nation2data);
 
-			d3.select("#menu-1").on("change", function(d) {
-				nation1 = d3.select("#menu-1").property("value");
-				nation1data = getNationData(data, nation1, series);
-			})
+			// console checks
+			if (nation1) { 
+				console.log("nation1 = ", nation1); 
+			}
+			if (nation2) { 
+				console.log("nation2 = ", nation2); 
+			}
+			if (series) { 
+				console.log("series = ", series); 
+			}
+			// if (nation1 != "null") {
+			// 	var nation1data = getNationData(data, nation1, series);
+			// }
+			// if (nation2 != "null") {
+			// 	var nation2data = getNationData(data, nation2, series);
+			// }
 
-			d3.select("#menu-2").on("change", function(d) {
-				nation2 = d3.select("#menu-2").property("value");
-				nation2data = getNationData(data, nation2, series);
-			})
+			// d3.select("#menu-1").on("change", function(d) {
+			// 	nation1 = d3.select("#menu-1").property("value");
+			// 	nation1data = getNationData(data, nation1, series);
+			// })
 
-			d3.select("#series").on("change", function(d) {
-				series = d3.selectAll(".series:checked").property("value");
-				nation1data = getNationData(data, nation1, series);
-				nation2data = getNationData(data, nation2, series);
-			})
+			// d3.select("#menu-2").on("change", function(d) {
+			// 	nation2 = d3.select("#menu-2").property("value");
+			// 	nation2data = getNationData(data, nation2, series);
+			// })
+
+			// d3.select("#series").on("change", function(d) {
+			// 	series = d3.selectAll(".series:checked").property("value");
+			// 	nation1data = getNationData(data, nation1, series);
+			// 	nation2data = getNationData(data, nation2, series);
+			// })
 		}
 
 		// main ------------------------------------------------
 
 		d3.json("nations.json", function(error, data) {
 			if (error) return error;
-			console.log(data);
+			console.log("data = ", data);
 
 			var nations = data.map(function(d) { return d.name; });
 
 			// set initial dropdown menu values
-			setMenu(nations, "#menu-1", "Brunei");
-			setMenu(nations, "#menu-2", "Qatar");
+			setMenu(nations, "#menu-1");
+			setMenu(nations, "#menu-2");
 
 			// var domain = setDomain(data, xVal, yVal);
 			// var range = setRange();
@@ -225,37 +239,11 @@
 			// var axisY = appendY(svg, axis);
 			// var title = appendTitle(svg, xVal, yVal);
 
-			update(data);
-			
+			d3.select("#menu")
+				.on("change", function(d) {
+					update(data);
+				});
 		})
-
-		function callback(error, csv_data) {
-			if (error) throw error;
-
-			var data = csv_data;
-			console.log(data);
-
-			var nation1 = d3.select("#menu1")
-				.property("value");
-			var nation2 = d3.select("#menu2")
-				.property("value");
-
-			updateSVG(svg, data, xVal, yVal, title, axisX, axisY);
-
-			d3.select("#menu-1").on("change", function(d) {
-				nation2 = d3.select("#y-menu")
-					.property("value");
-
-				var nation2Data = d3.nest()
-					.key(function(d) { return d.name == nation2 })
-					.object(data);
-				var nation2Series = nation2Data["true"][0].income;
-				console.log(nation2);
-
-				gNation2.datum(nation2Series)
-					.attr("d", line);
-			})
-		};
 	</script>
 </body>
 </html>

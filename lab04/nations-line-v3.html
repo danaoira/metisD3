@@ -41,14 +41,26 @@
 		.tick > line {
 			stroke: #c0c0c0;
 		}
+
+		.line1 {
+			fill: none;
+			stroke: pink;
+			stroke-width: 3px;
+		}
+
+		.line2 {
+			fill: none;
+			stroke: darkseagreen;
+			stroke-width: 3px;
+		}
 	</style>
 </head>
 <body>
 	<div class="container" style="width: 990px;">
 		<div id="menu" class="row">
 			<div class="col-md-4 col-xs-4">
-				<p>Select nations to compare data.</p>
-				<select id="menu-1" aria-label="Test">
+				<p>Select nations to explore data.</p>
+				<select id="menu-1">
 					<option value="null" selected>Nation 1</option>
 				</select>
 			</div>
@@ -155,6 +167,10 @@
 			}
 		}
 
+		function setLabel() {
+
+		}
+
 		// getters ---------------------------------------------
 
 		function getNationData(data, nation, series) {
@@ -190,23 +206,48 @@
 			return svg;
 		}
 
+		function appendLabel(svg) {
+			svg.select("#axis-y")
+				.append("text")
+				.text("")
+				.attr("transform", "translate(15, 0) rotate(-90)")
+				.attr("text-anchor", "end")
+				.attr("fill", "black")
+				.attr("class", "label-y");
+		}
+
+		function updateLabel(svg, series) {
+			var label;
+
+			if (series == "income") {
+				label = "Income (USD$)";
+			} else if (series == "lifeExpectancy") {
+				label = "Life Expectancy (Years)";
+			} else if (series == "population") {
+				label = "Population";
+			}
+
+			svg.select(".label-y")
+				.text(label);
+		}
+
 		// update ----------------------------------------------
 
-		function update(data, svg, axisX, axisY) {
+		function update(data, svg, axisX, axisY, line1, line2) {
 			var nation1 = d3.select("#menu-1").property("value");
 			var nation2 = d3.select("#menu-2").property("value");
 			var series = d3.selectAll(".series:checked").property("value");
-			var nation1data = (nation1 != "null") 
+			var nation1data = (nation1 !== "null") 
 				? getNationData(data, nation1, series) 
-				: null;
+				: undefined;
 			console.log("nation1data = ", nation1data);
-			var nation2data = (nation2 != "null") 
+			var nation2data = (nation2 !== "null") 
 				? getNationData(data, nation2, series) 
-				: null;
+				: undefined;
 			console.log("nation2data = ", nation2data);
 
 			// console checks
-			if (nation1) { 
+			if (nation1) {
 				console.log("nation1 = ", nation1); 
 				console.log(nation1data);
 			}
@@ -217,20 +258,39 @@
 				console.log("series = ", series); 
 			}
 
-			domain = setDomain(nation1data, nation2data);
-			range = setRange();
-			scale = setScale(domain, range);
-			axis = setAxis(scale);
+			var domain = setDomain(nation1data, nation2data);
+			var range = setRange();
+			var scale = setScale(domain, range);
+			var axis = setAxis(scale);
+
 			axisX.transition()
 				.duration(1000)
 				.call(axis.x);
+
 			axisY.transition()
 				.duration(1000)
-				.call(axis.y)
+				.call(axis.y);
+
+			updateLabel(svg, series);
 
 			var line = d3.line()
 				.x(function(d) { return scale.x(d[0]) })
 				.y(function(d) { return scale.y(d[1]) });
+
+			if (nation1 !== "null") {				
+				line1.datum(nation1data)
+					.transition()
+					.duration(1000)
+					.attr("d", line);
+			}
+
+			if (nation2 !== "null") {
+				line2.datum(nation2data)
+					.transition()
+					.duration(1000)
+					.attr("d", line);
+			}
+
 		}
 
 		// main ------------------------------------------------
@@ -242,16 +302,23 @@
 			var nations = data.map(function(d) { return d.name; });
 
 			// set initial dropdown menu values
-			setMenu(nations, "#menu-1");
-			setMenu(nations, "#menu-2");
+			setMenu(nations.sort(d3.ascending), "#menu-1");
+			setMenu(nations.sort(d3.ascending), "#menu-2");
 
 			var svg = appendSVG(svg);
 			var axisX = appendX(svg);
 			var axisY = appendY(svg);
+			var labelY = appendLabel(svg);
+			var line1 = svg.append("g")
+				.append("path")
+				.attr("class", "line1");
+			var line2 = svg.append("g")
+				.append("path")
+				.attr("class", "line2");
 
 			d3.select("#menu")
 				.on("change", function(d) {
-					update(data, svg, axisX, axisY);
+					update(data, svg, axisX, axisY, line1, line2);
 				});
 		})
 	</script>

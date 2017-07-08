@@ -47,11 +47,13 @@
 	<div class="container" style="width: 990px;">
 		<div id="menu" class="row">
 			<div class="col-md-4 col-xs-4">
+				<p>Select nations to compare data.</p>
 				<select id="menu-1" aria-label="Test">
 					<option value="null" selected>Nation 1</option>
 				</select>
 			</div>
 			<div class="col-md-4 col-xs-4">
+				<p>&nbsp;</p>
 				<select id="menu-2">
 					<option value="null" selected>Nation 2</option>
 				</select>
@@ -72,7 +74,7 @@
 	<script>
 		// global variables ------------------------------------
 
-		var margin = { top: 60, right: 50, bottom: 20, left: 50 };
+		var margin = { top: 0, right: 50, bottom: 20, left: 72 };
 		var width = 960 - margin.left - margin.right;
 		var height = 500 - margin.top - margin.bottom;
 
@@ -89,16 +91,39 @@
 				.text(function(d) { return d; });
 		}
 
-		// update selection
-		// function update() {
-		// };
-
 		// setters ---------------------------------------------
 
-		function setDomain(data, data1, data2) {
+		function setDomain(data1, data2) {
+			var xExtent;
+			var yExtent;
+
+			if (data1 && data2) {
+				xExtent = d3.extent(data1.map(function(d) { 
+					return d[0]; 
+				}).concat(data2.map(function(d) { 
+					return d[0]; 
+				})), function(d) { 
+					return d; 
+				})
+
+				yExtent = d3.extent(data1.map(function(d) { 
+					return d[1]; 
+				}).concat(data2.map(function(d) { 
+					return d[1]; 
+				})), function(d) { 
+					return d; 
+				})
+			} else if (data1) {
+				xExtent = d3.extent(data1, function(d) { return d[0]; })
+				yExtent = d3.extent(data1, function(d) { return d[1]; })
+			} else if (data2) {
+				xExtent = d3.extent(data2, function(d) { return d[0]; })
+				yExtent = d3.extent(data2, function(d) { return d[1]; })
+			}
+
 			return {
-				x: [1800, 2009],
-				y: d3.extent(data, function(d) { return d[yVal]; })
+				x: xExtent,
+				y: yExtent
 			}
 		}
 
@@ -120,10 +145,13 @@
 			}
 		}
 
-		function setAxes(scale) {
+		function setAxis(scale) {
 			return {
-				x: d3.axisBottom().scale(scale.x),
-				y: d3.axisLeft().scale(scale.y)
+				x: d3.axisBottom()
+					.scale(scale.x)
+					.tickFormat(d3.format("d")),
+				y: d3.axisLeft()
+					.scale(scale.y)
 			}
 		}
 
@@ -140,53 +168,47 @@
 
 		// append axes, title, svg -----------------------------
 
-		function appendX(svg, axis) {
-			var drawnX = svg.append("g")
-				.call(axis.x)
+		function appendX(svg) {
+			return svg.append("g")
+				.attr("id", "axis-x")
 				.attr("transform", "translate(0, " + height + ")");
-			return drawnX;
 		}
 
-		function appendY(svg, axis) {
-			drawnY = svg.append("g")
-				.call(axis.y);
-			return drawnY;
-		}
-
-		function appendTitle(svg, xVal, yVal) {
-			var title = svg.append("text")
-				.text(xVal + " vs. " + yVal)
-				.attr("class", "title")
-				.attr("transform", "translate(" + -margin.left + ", " + -(margin.top * 0.5) + ")")
-				.attr("text-anchor", "start");
-			return title;
+		function appendY(svg) {
+			return svg.append("g")
+				.attr("id", "axis-y");
 		}
 
 		function appendSVG() {
 			var svg = d3.select(".graph")
 				.append("svg")
-				.attr("class", "exo-graph")
 				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom)
 				.append("g")
-				.attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+				.attr("transform", "translate(" + margin.left + ", " 
+				+ margin.top + ")");
 			return svg;
 		}
 
 		// update ----------------------------------------------
 
-		function update(data) {
+		function update(data, svg, axisX, axisY) {
 			var nation1 = d3.select("#menu-1").property("value");
 			var nation2 = d3.select("#menu-2").property("value");
 			var series = d3.selectAll(".series:checked").property("value");
-			var nation1data = (nation1 != "null") ? getNationData(data, nation1, series) : null;
+			var nation1data = (nation1 != "null") 
+				? getNationData(data, nation1, series) 
+				: null;
 			console.log("nation1data = ", nation1data);
-			var nation2data = (nation2 != "null") ? getNationData(data, nation2, series) : null;
+			var nation2data = (nation2 != "null") 
+				? getNationData(data, nation2, series) 
+				: null;
 			console.log("nation2data = ", nation2data);
 
 			// console checks
 			if (nation1) { 
 				console.log("nation1 = ", nation1); 
+				console.log(nation1data);
 			}
 			if (nation2) { 
 				console.log("nation2 = ", nation2); 
@@ -194,28 +216,21 @@
 			if (series) { 
 				console.log("series = ", series); 
 			}
-			// if (nation1 != "null") {
-			// 	var nation1data = getNationData(data, nation1, series);
-			// }
-			// if (nation2 != "null") {
-			// 	var nation2data = getNationData(data, nation2, series);
-			// }
 
-			// d3.select("#menu-1").on("change", function(d) {
-			// 	nation1 = d3.select("#menu-1").property("value");
-			// 	nation1data = getNationData(data, nation1, series);
-			// })
+			domain = setDomain(nation1data, nation2data);
+			range = setRange();
+			scale = setScale(domain, range);
+			axis = setAxis(scale);
+			axisX.transition()
+				.duration(1000)
+				.call(axis.x);
+			axisY.transition()
+				.duration(1000)
+				.call(axis.y)
 
-			// d3.select("#menu-2").on("change", function(d) {
-			// 	nation2 = d3.select("#menu-2").property("value");
-			// 	nation2data = getNationData(data, nation2, series);
-			// })
-
-			// d3.select("#series").on("change", function(d) {
-			// 	series = d3.selectAll(".series:checked").property("value");
-			// 	nation1data = getNationData(data, nation1, series);
-			// 	nation2data = getNationData(data, nation2, series);
-			// })
+			var line = d3.line()
+				.x(function(d) { return scale.x(d[0]) })
+				.y(function(d) { return scale.y(d[1]) });
 		}
 
 		// main ------------------------------------------------
@@ -230,18 +245,13 @@
 			setMenu(nations, "#menu-1");
 			setMenu(nations, "#menu-2");
 
-			// var domain = setDomain(data, xVal, yVal);
-			// var range = setRange();
-			// var scale = setScale(domain, range);
-			// var axis = setAxis(scale);
-			// var svg = appendSVG(svg);
-			// var axisX = appendX(svg, axis);
-			// var axisY = appendY(svg, axis);
-			// var title = appendTitle(svg, xVal, yVal);
+			var svg = appendSVG(svg);
+			var axisX = appendX(svg);
+			var axisY = appendY(svg);
 
 			d3.select("#menu")
 				.on("change", function(d) {
-					update(data);
+					update(data, svg, axisX, axisY);
 				});
 		})
 	</script>

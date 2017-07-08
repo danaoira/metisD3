@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <style>
+    body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; }
+    rect { fill: pink; fill-opacity: 0.5; stroke: white; stroke-width: 3px; }
+  </style>
+</head>
+
+<body>
+  <script>
+    var margin = { top: 20, right: 20, bottom: 20, left: 20 };
+    var width = 960 - margin.left - margin.right;
+    var height = 500 - margin.top - margin.bottom;
+    var svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.bottom)
+      .attr("height", height + margin.top + margin.bottom)
+    	.append("g")
+    	.attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+    
+    var data = [
+      	{ name: "andrew", pens: 5, carrots: 50, phones: 1 }, 
+      	{ name: "avra", pens: 0, carrots: 25, phones: 1},
+      	{ name: "dana", pens: 3, carrots: 8, phones: 2},
+      	{ name: "elaine", pens: 8, carrots: 1, phones: 1},
+      	{ name: "kyle", pens: 20, carrots: 0, phones: 0},
+      	{ name: "megan", pens: 20, carrots: 22, phones: 8},
+      	{ name: "nam", pens: 20, carrots: 14, phones: 0},
+      	{ name: "naoya", pens: 15, carrots: 18, phones: 14},
+      	{ name: "patience", pens: 6, carrots: 3, phones: 89},
+      	{ name: "virginia", pens: 4, carrots: 18, phones: 2}
+    ]
+    
+    // min/max
+    var xExtent;
+    var yExtent = d3.extent(data, function(d) { return d.pens + d.carrots + d.phones });
+    
+    // domain
+    var xScale = d3.scaleBand()
+    	.domain(data.map(function(d) { 
+        return d.name; 
+      }))
+    	.range([0, width]);
+    var yScale = d3.scaleLinear()
+    	.domain([0, yExtent[1]])
+    	.range([height, 0]);
+    
+    var stack = d3.stack()
+      .keys(["pens", "carrots", "phones"])
+      .order(d3.stackOrderNone)
+      .offset(d3.stackOffsetNone);
+    
+    var series = stack(data);
+    
+    var groups = svg.selectAll("g")
+    	.data(stack(data))
+    	.enter()
+    	.append("g");
+    
+    var rects = groups.selectAll("rect")
+    	.data(function(d) { return d })
+    	.enter()
+    	.append("rect")
+    	.attr("x", function(d) { return xScale(d.data.name) })
+    	.attr("y", function(d) { return yScale(d[1]) })
+    	.attr("width", xScale.bandwidth())
+    	.attr("height", function(d) { return height + yScale(d[0]) })
+    	.attr("id", function(d) { return d.name });
+    
+  </script>
+</body>

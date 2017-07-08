@@ -51,12 +51,6 @@
 		// setters ---------------------------------------------
 
 		function setDomain(data) {
-			// return {
-			// 	x: null,
-			// 	y: d3.extent(data, function(d) {
-			// 		return d3.sum
-			// 	}
-			// }
 		}
 		
 		function setRange() {
@@ -64,6 +58,15 @@
 				x: [0, width],
 				y: [height, 0]
 			}
+		}
+
+		function setScale(domain, range) {
+			return {
+			}
+		}
+
+		function setAxis(scale) {
+
 		}
 
 
@@ -80,11 +83,34 @@
 					return { "total yield": d3.sum(leaves, function(d) { 
 						return parseInt(d.yield); 
 					})}
-				}).entries(data);
+				}).object(data);
 
 			console.log(newData);
 
-			
+
+			// // min/max
+			// var xExtent = d3.extent();
+			// var yExtent = d3.extent();
+
+			// // scales
+			// var xScale = d3.scaleBand()
+			// 	.domain()
+			// 	.range();
+			// var yScale = d3.scaleLinear()
+			// 	.domain()
+			// 	.range();
+
+			// // axes
+			// var xAxis = d3.axisBottom()
+			// 	.scale();
+			// var yAxis = d3.axisLeft()
+			// 	.scale();
+
+			// append svg
+
+			// append axes
+
+
 		}
 		
 		var url = "barleyfull.csv";

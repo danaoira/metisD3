@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <style>
+    body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; }
+  </style>
+</head>
+
+<body>
+  <svg></svg>
+  <script>
+//     var data = [{
+//     	name: 'Sequoia',
+//       investments: [
+//         {
+//         	name: 'Airbnb',
+//           amount: 20200, // millions
+//           year: 2010,
+//           sector: 'consumer'
+//         },
+//         {
+//           name: 'Pinterest',
+//           amount: 23874,
+//           year: 2008,
+//           sector: 'consumer'
+//         }
+//       ]
+//     }, {
+      
+//     }];
+    var data = [{
+      name: 'Airbnb',
+      amount: 20200, // millions
+      year: 2010,
+      sector: 'consumer',
+      investor: 'Sequoia'
+    }, {
+      name: 'Pinterest',
+      amount: 23874,
+      year: 2008,
+      sector: 'consumer',
+      investor: 'Sequoia'
+    }, {
+      name: 'Airbnb',
+      amount: 20200, // millions
+      year: 2010,
+      sector: 'consumer',
+      investor: 'Benchmark'
+    }, {
+      name: 'Spotify',
+      amount: 239847,
+      year: 2091,
+      sector: 'consumer',
+      investor: 'Benchmark'
+    }, {
+      name: 'Slack',
+      amount: 238947,
+      year: 2012,
+      sector: 'enterprise',
+      investor: 'a16z',
+    }, {
+      name: 'Slack',
+      amount: 238947,
+      year: 2012,
+      sector: 'enterprise',
+      investor: 'Google Ventures',
+    }, {
+      name: 'Tanium',
+      amount: 123987,
+      year: 2002,
+      sector: 'enterprise',
+      investor: 'IVP'
+    }, {
+      name: 'Tanium',
+      amount: 123987,
+      year: 2002,
+      sector: 'enterprise',
+      investor: 'a16z'
+    }];
+    
+    // bar chart, x-axis (ordinal) investor
+    // y-axis # of unicorns
+    // if stacked, sector (consumer vs. enterprise)
+    // color by sector
+    // hover to see individual unicorns
+    
+    // each bar is an investor
+    // end dataset:
+    // 
+    
+    
+    data = d3.nest()
+    	.key(function(d) { return d.investor })
+    	.entries(data);
+    var svg = d3.select("svg")
+    	.attr("width", 960)
+    	.attr("height", 500);
+    var bars = svg.selectAll("g")
+    	.data(data, function(d) { return d.key });
+    
+    // exit
+    bars.exit().remove();
+    
+    // enter
+    var enter = bars.enter().append("g");
+    enter.append("rect"); // inherit the data
+    enter.append("text"); // bound on the parent
+    
+    // enter + update
+    bars = enter.merge(bars)
+    	.attr("transform", function(d, i) { 
+        var x = i * 25;
+        var y = 500 - d.values.length * 100;
+    		return "translate(" + [x, y] + ")";
+    	});
+    
+    // rectangle height + y
+    bars.select("rect")
+    	.attr("height", function(d, i) { return d.values.length * 100 })
+    	.attr("width", 20)
+    	.attr("fill", "pink")
+    	.attr("opacity", 0.5);
+    bars.select("text")
+    	.text(function(d) { return d.values.length })
+    	.attr("x", 5)
+    	.attr("y", -5)
+    	.attr("fill", "black")
+    console.log(bars.nodes());
+    
+  </script>
+</body>

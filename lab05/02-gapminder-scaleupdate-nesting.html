@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<head>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <style>
+      body { 
+        margin: 0;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+
+    .title {
+      font-family: "Georgia";
+      font-size: 32px;
+      fill: #000;
+    }
+
+    .axis {
+      font-family: "Arial";
+      font-size: 11px;
+      fill: #808080;
+    }
+
+    .circle {
+      fill: pink;
+      fill-opacity: 0.5;
+      stroke: #c0c0c0;
+    }
+
+    .nation > text {
+      font-family: Arial, Verdana, Tahoma;
+      font-size: 11px;
+      fill: #808080;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    d3.json("nations.json", function(error, json) {
+      if (error) throw error;
+
+      // variables
+      var data = json;
+      console.log(data);
+      var width = 960;
+      var height = 500;
+      var margin = { top: 75, right: 30, bottom: 20, left: 30 };
+
+      // min-max
+      var xExtent = d3.extent(data, function(d) { return d.income });
+      var yExtent = d3.extent(data, function(d) { return d.lifeExpectancy });
+
+      // scales
+      var xScaleLinear = d3.scaleLinear()
+        .domain(xExtent)
+        .range([margin.left, width - margin.right]);
+      var xScaleLog = d3.scaleLog()
+        .domain(xExtent)
+        .range([margin.left, width - margin.right]);
+      var xScale = xScaleLinear;
+      var yScale = d3.scaleLinear()
+        .domain(yExtent)
+        .range([height - margin.bottom, margin.top]);
+
+      // axes
+      var xAxis = d3.axisBottom()
+        .scale(xScale);
+      var yAxis = d3.axisLeft()
+        .scale(yScale);
+
+      // svg
+      var svg = d3.select("body")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+      var group = svg.selectAll("g")
+        .data(data, function(d) { return d.name });
+
+      // exit
+      group.exit().remove();
+
+      // enter and update
+      group = group.enter().append("g")
+        .classed("nation", true)
+        .merge(group);
+      group.append("circle");
+      group.append("text");
+
+      group.select("circle")
+        .attr("cx", function(d) { return xScale(d.income); })
+        .attr("cy", function(d) { return yScale(d.lifeExpectancy); })
+        .attr("r", 7)
+        .attr("class", "circle");
+      group.select("text")
+        .attr("x", function(d) { return (xScale(d.income) + 3); })
+        .attr("y", function(d) { return yScale(d.lifeExpectancy); })
+        .text(function(d) { return d.name; });
+
+      // axes
+      var axisX = svg.append("g")
+        .call(xAxis)
+        .attr("transform", "translate(" + [0, height - margin.bottom] + ")");
+
+      var axisY = svg.append("g")
+        .call(yAxis)        
+        .attr("transform", "translate(" + [margin.left, 0] + ")");
+
+
+      // titles
+      var title = svg.append("text")
+        .text("The Health and Wealth of Nations, 2009")
+        .attr("class", "title")
+        .attr("transform", "translate(" + [margin.left + width * 0.5, margin.top * 0.65] + ")")
+        .attr("text-anchor", "middle")
+        .attr("fill", "#000");
+      var xTitle = axisX.append("text")
+        .text("income per capita (dollars)")
+        .attr("transform", "translate(" + [width - margin.right, 0 - margin.bottom / 2] + ")")
+        .attr("text-anchor", "end")
+        .attr("class", "axis");
+      var yTitle = axisY.append("text")
+        .text("life expectancy (years)")
+        .attr("transform", "translate(" + [margin.left * 0.5, margin.top] + ") rotate(" + -90 + ")")
+        .attr("class", "axis"); 
+
+      d3.select("svg")
+        .on("click", function() {
+          if (xScale == xScaleLinear) {
+            xScale = xScaleLog;
+            xAxis.scale(xScale).ticks(10, ".0f");
+            xTitle.text("income per capita, inflation adjusted (dollars)");
+          } else if (xScale == xScaleLog) {
+            xScale = xScaleLinear;
+            xAxis.scale(xScale)
+            xTitle.text("income per capita (dollars)");
+          }
+
+          group.select("circle")
+            .transition()
+            .duration(1000)
+            .attr("cx", function(d) { return xScale(d.income); });
+          group.select("text")
+            .transition()
+            .duration(1000)
+            .attr("x", function(d) { return (xScale(d.income) + 3); });
+
+          axisX.transition()
+            .duration(1000)
+            .call(xAxis);
+        });
+    });
+  </script>
+</body>
+</html>

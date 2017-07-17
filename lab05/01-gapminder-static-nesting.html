@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<head>
+  
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <style>
+    
+    body { 
+      margin:0;
+      position:fixed;
+      top:0;
+      right:0;
+      bottom:0;
+      left:0; 
+    }
+    .axis {
+      font-family: "Lato";
+      font-size: 10px;
+      fill: #808080;
+      opacity:1;
+    }
+    .text {
+      font-family: "Lato", Arial, Verdana;
+      font-size: 10px;
+      fill: #808080;
+    }
+    
+  </style>
+</head>
+<body>
+ <script>
+   
+d3.json("nations.json", function(error, json) {
+      if (error) throw error;
+      console.log(json);
+  
+    var data = json;
+    var width = 960;
+    var height = 500;
+    var margin = { top: 75, right: 30, bottom: 20, left: 30 };
+    
+//calculate x and y min/max
+  
+  var xExtent = d3.extent(data, function(d) { return d.income });
+  var yExtent = d3.extent(data, function(d) { return    d.lifeExpectancy });
+ 
+
+//calculate x and y scale
+  
+  var xScale = d3.scaleLinear()
+        .domain(xExtent)
+        .range([margin.left, width-margin.right]);
+  
+  var yScale = d3.scaleLinear()
+        .domain([0, yExtent[1]])
+        .range([height-margin.bottom, margin.top]);
+  
+//create axis
+  var xAxis = d3.axisBottom()
+        .scale(xScale);
+  var yAxis = d3.axisLeft()
+        .scale(yScale);  
+
+//create the svg canvas, append it to the body, set dimentions  
+  var svg = d3.select("body")
+  .append("svg")
+  .attr("width", width)
+  .attr("height", height);
+  
+//select all the (to-be-made) circles 
+  var countries = svg.selectAll('g')
+    .data(data, function(d) { return d.name })
+    .classed('countries', true);
+  
+  // exit
+  countries.exit().remove();
+  
+  countries = countries.enter();
+   
+//bind circles to the data and put them in g
+  var circle = countries.select('g')
+    .data(data, function(d) {return d.name}); 
+  
+  circle.exit().remove();
+
+ //enter and append circles and text to group 
+  var enter = circle.enter().append('g');
+  enter.append('circle');
+  enter.append('text');
+  
+  circle = enter.merge(circle);
+  
+  circle.select('circle')
+  .attr("cx", function(d) {return xScale(d.income)})
+  .attr("cy", function(d) {return yScale(d.lifeExpectancy)})
+  .attr("r", 10)
+  .style('fill', 'ec008b')
+  .style('stroke', 'white')
+  .style('fill-opacity', .60);
+ 
+  //append text to the circles
+  circle.select('text')
+  .text(function(d) {return d.name})
+  .attr('x', function(d) {return xScale(d.income)})
+  .attr('y', function(d) {return yScale(d.lifeExpectancy)})
+  .attr("text-anchor", "middle")
+  .attr('class', 'text');
+    
+//draw x and y axis 
+var axisX = svg.append("g")
+        .attr("transform", "translate(" + [0, height-margin.bottom] + ")")
+        .call(xAxis)
+        .attr('opacity', .5)
+        .attr("stroke-dasharray", "1,2");
+
+var axisY = svg.append("g")
+        .attr("transform", "translate(" + [margin.left, 0] + ")")
+        .call(yAxis)
+        .attr('opacity', .5)
+        .attr("stroke-dasharray", "1,2");
+          
+//x and y axis labels
+  var xLabel = axisX.append("text")
+        .text("INCOME PER CAPITA (DOLLARS)")
+        .style("font-size", 12)
+        .style("font-family", "Lato")
+        .style("fill", "black")
+        .style("opacity", .6)
+        .attr("transform", "translate(" + [width - margin.right, 0 - margin.bottom /2] + ")")
+        .attr("text-anchor", "end");
+        //.attr("class", "axis");
+  
+      var yLabel = axisY.append("text")
+        .text("LIFE EXPECTANCY (YEARS)")
+        .attr("transform", "translate(" + [margin.left * 0.5, margin.top] + ") rotate(" + -90 + ")")
+        .attr("class", "axis");
+  
+  //title
+ 
+   var title = svg.append("text")
+      .text("THE WEALTH & HEALTH OF NATIONS, 2009")
+      .attr("transform", "translate("+[margin.left, margin.top * 0.65]+")")
+      .attr("text-anchor","left")
+      .style("font-size", 32)
+      .style("font-family", "Lato")
+      .style("fill", "black")
+      .style("opacity", .6);
+});
+          
+
+    
+  
+  </script>
+</body>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <style>
+    body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; }
+  </style>
+</head>
+
+<body>
+  <svg />
+  <script>
+//     var data = [{
+//     	name: 'Sequoia',
+//       investments: [
+//         {
+//         	name: 'Airbnb',
+//           amount: 20200, // millions
+//           year: 2010,
+//           sector: 'consumer'
+//         },
+//         {
+//           name: 'Pinterest',
+//           amount: 23874,
+//           year: 2008,
+//           sector: 'consumer'
+//         }
+//       ]
+//     }, {
+      
+//     }];
+    var data = [{
+      name: 'Airbnb',
+      amount: 20200, // millions
+      year: 2010,
+      sector: 'enterprise',
+      investor: 'Sequoia'
+    }, {
+      name: 'Pinterest',
+      amount: 23874,
+      year: 2008,
+      sector: 'consumer',
+      investor: 'Sequoia'
+    }, {
+      name: 'Airbnb',
+      amount: 20200, // millions
+      year: 2010,
+      sector: 'consumer',
+      investor: 'Benchmark'
+    }, {
+      name: 'Spotify',
+      amount: 239847,
+      year: 2091,
+      sector: 'consumer',
+      investor: 'Sequoia'
+    }, {
+      name: 'Slack',
+      amount: 238947,
+      year: 2012,
+      sector: 'enterprise',
+      investor: 'a16z',
+    }, {
+      name: 'Slack',
+      amount: 238947,
+      year: 2012,
+      sector: 'enterprise',
+      investor: 'Google Ventures',
+    }, {
+      name: 'Tanium',
+      amount: 123987,
+      year: 2002,
+      sector: 'enterprise',
+      investor: 'IVP'
+    }, {
+      name: 'Lyft',
+      amount: 123987,
+      year: 2002,
+      sector: 'consumer',
+      investor: 'a16z'
+    }];
+    
+    // bar chart, x-axis (ordinal) investor
+    // y-axis # of unicorns
+    // if stacked, sector (consumer vs. enterprise)
+    // color by sector
+    // hover to see individual unicorns
+    
+    // 1. group by investor (for x-axis)
+    // 2. calculate stack for each sector
+    data = d3.nest()
+    	.key(function(d) {return d.investor})
+    	.key(function(d) {return d.sector})
+    	.entries(data);
+    var stack = d3.stack()
+    	.keys(['consumer', 'enterprise'])
+    	.value(function(investor, key) {
+        // if sector key matches key given
+        var sector = investor.values.find(function(sector) {return sector.key === key});
+        if (!sector) return 0;
+        return sector.values.length;
+      });
+    var series = stack(data);
+    console.log(series)
+    
+    var svg = d3.select('svg')
+    	.attr('width', 960).attr('height', 500);
+    var sectors = svg.selectAll('g')
+    	.data(series, function(sector) {return sector.key});
+        
+   	// exit
+    sectors.exit().remove();
+    
+    // enter + update
+    sectors = sectors.enter().append('g')
+    	.classed('sector', true)
+    	.merge(sectors);
+    
+    // rectangles for each investor
+    var investor = sectors.selectAll('g')
+    	.data(function(sector) { return sector }, function(investor) {
+        return investor.data.key;
+      });
+    
+    // exit
+    investor.exit().remove();
+    
+    // enter+update
+    var enter = investor.enter().append('g');
+    enter.append('rect');
+    enter.append('text');
+    
+    investor = enter.merge(investor);
+    
+    investor.select('rect')
+    	.attr('x', function(investor, i) {return i * 25})
+    	.attr('y', function(investor) {return 500 - investor[1] * 100})
+    	.attr('width', 20)
+    	.attr('height', function(investor) {return (investor[1] - investor[0]) * 100})
+    	.attr('fill', '#fff')
+    	.attr('stroke', '#000');
+    
+    investor.select('text')
+    	.text(function(d) { return d[1]})
+    	.attr('x', function(investor, i) {return i * 28})
+    	.attr('y', function(investor) {return 490 - investor[1] * 100})
+    	.attr('fill', 'black');
+    
+  </script>
+</body>

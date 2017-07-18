@@ -75,7 +75,6 @@
 
 		}
 
-
 		// main ================================================
 
 		function main(error, data) {
@@ -93,36 +92,10 @@
 
 			console.log(newData);
 
-
-			// // min/max
-			// var xExtent = d3.extent();
-			// var yExtent = d3.extent();
-
-			// // scales
-			// var xScale = d3.scaleBand()
-			// 	.domain()
-			// 	.range();
-			// var yScale = d3.scaleLinear()
-			// 	.domain()
-			// 	.range();
-
-			// // axes
-			// var xAxis = d3.axisBottom()
-			// 	.scale();
-			// var yAxis = d3.axisLeft()
-			// 	.scale();
-
-			// append svg
-
-			// append axes
-
-
 		}
 		
 		var url = "barleyfull.csv";
 		d3.csv(url, convertCSV, main);
-
-
 	</script>
 </body>
 </html>

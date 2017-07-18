@@ -36,7 +36,7 @@
     var xExtent;
     var yExtent = d3.extent(data, function(d) { return d.pens + d.carrots + d.phones });
     
-    // scale
+    // domain
     var xScale = d3.scaleBand()
     	.domain(data.map(function(d) { 
         return d.name; 

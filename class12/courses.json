@@ -1,0 +1,166 @@
+{
+	"name": "ROOT",
+	"children": [
+		{
+			"name": "CPSC 120",
+			"children": [
+				{
+					"name": "CPSC 121",
+					"children": [
+						{
+							"name": "CPSC 131",
+							"children": [
+								{
+									"name": "CPSC 223",
+									"children": [
+										{
+											"name": "CPSC 476"
+										}
+									]
+								},
+								{
+									"name": "CPSC 240",
+									"children": [
+										{
+											"name": "CPSC 440"
+										}
+									]
+								},
+								{
+									"name": "CPSC 254",
+									"children": [
+										{
+											"name": "CPSC 301",
+											"children": [
+												{
+													"name": "CPSC 323"
+												}, 
+												{
+													"name": "CPSC 335",
+													"children": [
+														{
+															"name": "CPSC 481"
+														}
+													]
+												}, 
+												{
+													"name": "CPSC 362"
+												}
+											]
+										}, 
+										{
+											"name": "CPSC 351",
+											"children": [
+												{
+													"name": "CPSC 471"
+												}, 
+												{
+													"name": "CPSC 476",
+													"children": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "CPSC 311",
+									"children": [
+										{
+											"name": "CPSC 315"
+										}, 
+										{
+											"name": "CPSC 362"
+										}
+									]
+								},
+								{
+									"name": "CPSC 332",
+									"children": [
+										{
+											"name": "CPSC 431"
+										},
+										{
+											"name": "CPSC 473"
+										}
+									]
+								}
+							]
+						}
+					]	
+				}
+			]
+		},
+		{
+			"name": "ENGL 101",
+			"children": [
+				{
+					"name": "CPSC 311",
+					"children": [
+						{
+							"name": "CPSC 315"
+						}, 
+						{
+							"name": "CPSC 362"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "MATH 150A",
+			"children": [
+				{
+					"name": "MATH 150B",
+					"children": [
+						{
+							"name": "MATH 338",
+							"children": [
+								{
+									"name": "CPSC 335",
+									"children": []
+								}
+							]
+						},
+						{
+							"name": "MATH 250A"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "MATH 270A",
+			"children": [
+				{
+					"name": "CPSC 240",
+					"children": []
+				},
+				{
+					"name": "MATH 270B",
+					"children": [
+						{
+							"name": "CPSC 335",
+							"children": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "PHYS 225",
+			"children": [
+				{
+					"name": "PHYS 225L"
+				},
+				{
+					"name": "PHYS 226",
+					"children": [
+						{
+							"name": "PHYS 226L"
+						}
+					]
+				}
+			]
+		}
+	]
+}

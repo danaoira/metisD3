@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<head>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<style>
+    	body { 
+    		margin: 0;
+    		position: fixed;
+    		top: 0;
+    		right: 0;
+    		bottom: 0;
+    		left: 0;
+		}
+	</style>
+</head>
+<body>
+	<script>
+		var margin = { top: 20, right: 20, bottom: 20, left: 50 };
+		var width = 960 - margin.left - margin.right;
+		var height = 1000 - margin.top - margin.bottom;
+		var svg = d3.select("svg");
+		var g = svg.append("g")
+			.attr("transform", "translate(" + margin.left + ", " + margin.top +")");
+		var json = "courses.json";
+		var csv = "courses.csv";
+
+		var cluster = d3.cluster()
+			.size([height, width - 140]);
+
+		var table = d3.csvParse(csv);
+		console.log(table);
+
+		var root = d3.stratify()
+			.id(function(d) { return d.name; })
+			.parentId(function(d) { return d.parent; })
+			(table);
+		console.log(root);
+
+	</script>
+</body>
+</html>
